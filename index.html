@@ -284,6 +284,12 @@
 
         <button id="apply-btn">تطبيق الكشيدة</button>
         <button id="remove-btn" class="btn-secondary">إزالة الكشيدة</button>
+
+        <div class="control-group" style="border: 1px solid var(--success-color); margin-top: 10px; background-color: rgba(46, 139, 87, 0.1);">
+            <div style="font-size: 13px; margin-bottom: 8px; color: #dcdcdc; font-weight: bold;">الربط المباشر مع فوتوبيا:</div>
+            <button id="read-photopea-btn" class="btn-secondary" style="margin-bottom: 8px; padding: 10px;">📥 1. سحب النص من البرنامج</button>
+            <button id="send-photopea-btn" style="background-color: var(--success-color); padding: 10px;">📤 2. تحديث لاير النص</button>
+        </div>
     </div>
 
     <div class="workspace">
@@ -313,15 +319,14 @@
         const fontSelector = document.getElementById('font-selector');
         const weightSelector = document.getElementById('font-weight-selector');
         const dynamicFontsStyle = document.getElementById('dynamic-fonts');
-        let fontFamiliesMap = {}; // خريطة لتخزين العائلات والأوزان
+        let fontFamiliesMap = {}; 
         
-        // الترقية للإصدار 2 لدعم هيكل الأوزان والعائلات
         const request = indexedDB.open("KashidaFontsDB_Pro", 2);
         
         request.onupgradeneeded = function(e) {
             db = e.target.result;
             if (db.objectStoreNames.contains('fonts')) {
-                db.deleteObjectStore('fonts'); // مسح الهيكل القديم
+                db.deleteObjectStore('fonts'); 
             }
             db.createObjectStore('fonts', { keyPath: 'id' });
         };
@@ -331,7 +336,6 @@
             loadSavedFonts();
         };
 
-        // خوارزمية استخراج عائلة الخط والوزن من اسم الملف
         function parseFontInfo(fileName) {
             let nameObj = fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
             let family = nameObj;
@@ -349,7 +353,6 @@
             else if(lower.includes('black') || lower.includes('heavy') || lower.includes('900')) { weightName = 'Black'; weightVal = 900; }
             else if(lower.includes('bold') || lower.includes('700')) { weightName = 'Bold'; weightVal = 700; }
 
-            // تنظيف اسم العائلة من الأوزان والأرقام والشرطات
             family = family.replace(new RegExp(`[-_\\s]?(${weightName}|italic|100|200|300|400|500|600|700|800|900)($|[\\s_\\-])`, 'ig'), '');
             family = family.replace(/[-_]/g, ' ').trim() || 'UnknownFamily';
             family = family.replace(/[^a-zA-Z0-9\s]/g, '');
@@ -357,7 +360,6 @@
             return { family, weightName, weightVal };
         }
 
-        // رفع خطوط متعددة بانتظام
         document.getElementById('add-font-btn').addEventListener('click', () => {
             document.getElementById('font-upload').click();
         });
@@ -368,7 +370,6 @@
             
             document.getElementById('add-font-btn').textContent = '⏳ جاري...';
             
-            // قراءة كل الملفات باستخدام Promise للتأكد من إنهاء الجميع
             const promises = Array.from(files).map(file => {
                 return new Promise((resolve) => {
                     const reader = new FileReader();
@@ -398,7 +399,6 @@
             
             transaction.oncomplete = function() {
                 document.getElementById('add-font-btn').textContent = '➕ رفع';
-                // تحميل الخطوط وتحديد أول عائلة تمت إضافتها
                 loadSavedFonts(fonts[0].family);
             };
         }
@@ -424,7 +424,6 @@
                 
                 dynamicFontsStyle.innerHTML = css;
                 
-                // ترتيب الأوزان تصاعدياً داخل كل عائلة
                 Object.keys(fontFamiliesMap).forEach(fam => {
                     fontFamiliesMap[fam].sort((a, b) => a.val - b.val);
                 });
@@ -484,7 +483,6 @@
             }
             
             if (!weightFound && weightSelector.options.length > 0) {
-                // محاولة اختيار العادي لو موجود، وإلا اختيار أول وزن متاح
                 let regularIdx = 0;
                 for(let i=0; i<weightSelector.options.length; i++) {
                     if(weightSelector.options[i].value === "400") regularIdx = i;
@@ -537,7 +535,6 @@
                 processTextWeb(); 
             }
         });
-
 
         // ==========================================
         // 2. المحرك الأساسي للكشيدة
@@ -965,6 +962,74 @@
             document.getElementById('output-text').innerHTML = txt.replace(/\n/g, '<br>');
         });
 
+        // ==========================================
+        // 3. الربط المباشر مع Photopea (Live Messaging)
+        // ==========================================
+        window.addEventListener("message", function(e) {
+            if (e.data === "done") return;
+            
+            if (e.data === "ERROR_NO_TEXT_LAYER") {
+                alert("يرجى تحديد لاير نص (Text Layer) داخل فوتوبيا أولاً!");
+                return;
+            }
+
+            if (typeof e.data === "string") {
+                document.getElementById('input-text').value = e.data;
+                processTextWeb();
+                
+                const readBtn = document.getElementById('read-photopea-btn');
+                const originalText = readBtn.innerHTML;
+                readBtn.innerHTML = "✔️ تم سحب النص";
+                setTimeout(() => readBtn.innerHTML = originalText, 2000);
+            }
+        });
+
+        document.getElementById('read-photopea-btn').addEventListener('click', function() {
+            const script = `
+                if (app.documents.length > 0 && app.activeDocument.activeLayer.kind == LayerType.TEXT) {
+                    app.echoToOE(app.activeDocument.activeLayer.textItem.contents);
+                } else {
+                    app.echoToOE("ERROR_NO_TEXT_LAYER");
+                }
+            `;
+            window.parent.postMessage(script, "*");
+        });
+
+        document.getElementById('send-photopea-btn').addEventListener('click', function() {
+            const outputText = document.getElementById('output-text').innerText;
+            if (!outputText.trim()) {
+                alert("لا يوجد نص منسق لإرساله!");
+                return;
+            }
+
+            const escapedText = outputText
+                .replace(/\\/g, "\\\\")
+                .replace(/\r?\n/g, "\\r")
+                .replace(/"/g, "\\\"");
+
+            const script = `
+                if (app.documents.length === 0) {
+                    app.documents.add();
+                }
+                var doc = app.activeDocument;
+                var layer = doc.activeLayer;
+                
+                if (layer.kind != LayerType.TEXT) {
+                    layer = doc.artLayers.add();
+                    layer.kind = LayerType.TEXT;
+                    layer.textItem.size = 60; 
+                }
+                
+                layer.textItem.contents = "${escapedText}";
+            `;
+            
+            window.parent.postMessage(script, "*");
+            
+            const sendBtn = document.getElementById('send-photopea-btn');
+            const originalText = sendBtn.innerHTML;
+            sendBtn.innerHTML = "✔️ تم التحديث بنجاح";
+            setTimeout(() => sendBtn.innerHTML = originalText, 2000);
+        });
     </script>
 </body>
 </html>
