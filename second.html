@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kashida Pro - Web Version</title>
+    <style id="dynamic-fonts"></style>
+    <style>
+        :root {
+            --bg-color: #323232;
+            --panel-bg: #252525;
+            --text-color: #dcdcdc;
+            --accent-color: #1473e6;
+            --accent-hover: #1782ff;
+            --border-color: #444;
+            --btn-bg: #4a4a4a;
+            --btn-hover: #5a5a5a;
+            --success-color: #2e8b57;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 100%;
+            background-color: var(--panel-bg);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .workspace {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            flex-grow: 1;
+        }
+
+        .text-area-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex-grow: 1;
+        }
+
+        textarea, .output-box {
+            width: 100%;
+            background-color: #1e1e1e;
+            color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 15px;
+            font-size: 20px;
+            font-family: Arial, sans-serif;
+            resize: vertical;
+            line-height: 1.8;
+            min-height: 180px;
+        }
+
+        .output-wrapper {
+            position: relative;
+            display: flex;
+            flex-grow: 1;
+        }
+
+        .output-box {
+            overflow-y: auto;
+            text-align: right;
+            white-space: pre-wrap;
+            min-height: 250px;
+            flex-grow: 1;
+            font-variant-ligatures: contextual common-ligatures;
+            font-feature-settings: "liga" 1, "clig" 1, "calt" 1;
+        }
+
+        .copy-overlay-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: #ccc;
+            border: 1px solid #555;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: all 0.3s ease;
+            z-index: 10;
+            width: max-content;
+            min-width: unset;
+        }
+
+        .copy-overlay-btn:hover {
+            opacity: 1;
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        h1 { margin: 0; font-size: 18px; color: #fff; }
+        h2 { margin: 0; font-size: 14px; color: #aaa; font-weight: normal; }
+
+        .control-group {
+            background-color: rgba(0,0,0,0.1);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        input[type="range"] { 
+            width: 100%; 
+            height: 30px; 
+        }
+
+        select {
+            width: 100%;
+            padding: 8px;
+            background-color: #1e1e1e;
+            color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+
+        select:focus { outline: none; border-color: var(--accent-color); }
+
+        .checkbox-group {
+            display: flex; 
+            gap: 10px; 
+            align-items: center;
+            padding: 5px 0;
+            cursor: pointer;
+        }
+
+        input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer;}
+        label { cursor: pointer; }
+
+        button {
+            background-color: var(--accent-color);
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            transition: 0.2s;
+            width: 100%;
+        }
+        
+        button:hover { background-color: var(--accent-hover); }
+        
+        .btn-success { background-color: var(--success-color) !important; }
+        .btn-secondary { background-color: var(--btn-bg); }
+        .btn-secondary:hover { background-color: var(--btn-hover); }
+
+        .history-container {
+            background-color: var(--panel-bg);
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+        .history-item {
+            background-color: #1e1e1e;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 10px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .history-text {
+            font-size: 18px;
+            line-height: 1.8;
+            text-align: right;
+            white-space: pre-wrap;
+        }
+        .copy-history-btn {
+            padding: 8px;
+            font-size: 13px;
+            align-self: flex-end;
+            width: auto;
+            min-width: 100px;
+        }
+
+        @media (min-width: 768px) {
+            body { flex-direction: row; height: 100vh; overflow: hidden; }
+            .sidebar { width: 330px; flex-shrink: 0; overflow-y: auto; }
+            .workspace { overflow-y: auto; padding-right: 10px; }
+            textarea, .output-box { resize: none; flex-grow: 1; min-height: 200px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div>
+            <h1>Kashida Pro (Web)</h1>
+            <h2>أداة تسوية النصوص العربية</h2>
+        </div>
+
+        <div class="control-group" style="border: 1px solid var(--accent-color);">
+            <div style="font-size: 13px; margin-bottom: 8px; color: #dcdcdc; font-weight: bold;">مكتبة الخطوط والأوزان:</div>
+            
+            <div style="display: flex; gap: 5px; margin-bottom: 5px;">
+                <select id="font-selector" style="flex: 2;" title="عائلة الخط">
+                    <option value="Arial, sans-serif">الافتراضي (Arial)</option>
+                    <option value="'Segoe UI', Tahoma, sans-serif">Segoe UI</option>
+                    <option value="'Times New Roman', Times, serif">Times New Roman</option>
+                </select>
+                <button id="add-font-btn" class="btn-secondary" style="flex: 1; padding: 0;" title="إضافة خطوط (تحديد متعدد)">➕ رفع</button>
+                <input type="file" id="font-upload" accept=".ttf,.otf,.woff,.woff2" style="display:none;" multiple>
+            </div>
+            
+            <select id="font-weight-selector" title="وزن الخط">
+                <option value="400">عادي (Regular)</option>
+                <option value="700">عريض (Bold)</option>
+            </select>
+            
+            <div class="checkbox-group" style="margin-top: 8px;">
+                <input type="checkbox" id="opentype-ligatures" checked>
+                <label for="opentype-ligatures" style="font-size: 13px; color: #aaa;">تفعيل تشابك الحروف (Ligatures)</label>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <div style="font-size: 13px; margin-bottom: 8px; color: #dcdcdc;">طريقة المحاذاة والتمديد:</div>
+            <select id="alignment-mode">
+                <option value="longest">ذكي (يساوي السطور بأطول سطر)</option>
+                <option value="box">ملء المربع (تمديد لكامل الشاشة)</option>
+                <option value="manual">تمديد حُر (تمديد إجباري حسب المؤشر)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <div class="row">
+                <span>أقصى كشيدة للكلمة</span>
+                <span id="max-val">5</span>
+            </div>
+            <input type="range" id="max-kashida" min="1" max="30" value="5">
+        </div>
+
+        <div class="control-group">
+            <div class="checkbox-group">
+                <input type="checkbox" id="random-mode" checked>
+                <label for="random-mode" style="font-size: 14px;">توزيع عشوائي (تغيير الشكل)</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="force-last-line" checked>
+                <label for="force-last-line" style="font-size: 14px;">فرض الكشيدة على السطر الأخير</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="kurdish-mode">
+                <label for="kurdish-mode" style="font-size: 14px;">تفعيل وضع كوردی</label>
+            </div>
+        </div>
+
+        <button id="apply-btn">تطبيق الكشيدة</button>
+        <button id="remove-btn" class="btn-secondary">إزالة الكشيدة</button>
+    </div>
+
+    <div class="workspace">
+        <div class="text-area-container">
+            <label style="font-size: 14px; color: #aaa;">النص الأصلي:</label>
+            <textarea id="input-text" placeholder="اكتب النص هنا ثم اضغط تطبيق..."></textarea>
+        </div>
+        <div class="text-area-container">
+            <label style="font-size: 14px; color: #aaa;">النتيجة المنسقة:</label>
+            <div class="output-wrapper">
+                <div id="output-text" class="output-box"></div>
+                <button id="copy-main-btn" class="copy-overlay-btn" title="نسخ النتيجة">📋 نسخ</button>
+            </div>
+        </div>
+
+        <div class="history-container" id="history-container" style="display: none;">
+            <label style="font-size: 14px; color: #aaa;">سجل آخر 3 أشكال (History):</label>
+            <div id="history-list"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. نظام إدارة الخطوط المتقدم (IndexedDB V2)
+        // ==========================================
+        let db;
+        const fontSelector = document.getElementById('font-selector');
+        const weightSelector = document.getElementById('font-weight-selector');
+        const dynamicFontsStyle = document.getElementById('dynamic-fonts');
+        let fontFamiliesMap = {}; // خريطة لتخزين العائلات والأوزان
+        
+        // الترقية للإصدار 2 لدعم هيكل الأوزان والعائلات
+        const request = indexedDB.open("KashidaFontsDB_Pro", 2);
+        
+        request.onupgradeneeded = function(e) {
+            db = e.target.result;
+            if (db.objectStoreNames.contains('fonts')) {
+                db.deleteObjectStore('fonts'); // مسح الهيكل القديم
+            }
+            db.createObjectStore('fonts', { keyPath: 'id' });
+        };
+        
+        request.onsuccess = function(e) {
+            db = e.target.result;
+            loadSavedFonts();
+        };
+
+        // خوارزمية استخراج عائلة الخط والوزن من اسم الملف
+        function parseFontInfo(fileName) {
+            let nameObj = fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
+            let family = nameObj;
+            let weightName = 'Regular';
+            let weightVal = 400;
+
+            const lower = nameObj.toLowerCase();
+
+            if(lower.includes('thin') || lower.includes('100')) { weightName = 'Thin'; weightVal = 100; }
+            else if(lower.includes('extralight') || lower.includes('ultralight') || lower.includes('200')) { weightName = 'ExtraLight'; weightVal = 200; }
+            else if(lower.includes('light') || lower.includes('300')) { weightName = 'Light'; weightVal = 300; }
+            else if(lower.includes('medium') || lower.includes('500')) { weightName = 'Medium'; weightVal = 500; }
+            else if(lower.includes('semibold') || lower.includes('demibold') || lower.includes('600')) { weightName = 'SemiBold'; weightVal = 600; }
+            else if(lower.includes('extrabold') || lower.includes('ultrabold') || lower.includes('800')) { weightName = 'ExtraBold'; weightVal = 800; }
+            else if(lower.includes('black') || lower.includes('heavy') || lower.includes('900')) { weightName = 'Black'; weightVal = 900; }
+            else if(lower.includes('bold') || lower.includes('700')) { weightName = 'Bold'; weightVal = 700; }
+
+            // تنظيف اسم العائلة من الأوزان والأرقام والشرطات
+            family = family.replace(new RegExp(`[-_\\s]?(${weightName}|italic|100|200|300|400|500|600|700|800|900)($|[\\s_\\-])`, 'ig'), '');
+            family = family.replace(/[-_]/g, ' ').trim() || 'UnknownFamily';
+            family = family.replace(/[^a-zA-Z0-9\s]/g, '');
+
+            return { family, weightName, weightVal };
+        }
+
+        // رفع خطوط متعددة بانتظام
+        document.getElementById('add-font-btn').addEventListener('click', () => {
+            document.getElementById('font-upload').click();
+        });
+
+        document.getElementById('font-upload').addEventListener('change', async function(e) {
+            const files = e.target.files;
+            if(files.length === 0) return;
+            
+            document.getElementById('add-font-btn').textContent = '⏳ جاري...';
+            
+            // قراءة كل الملفات باستخدام Promise للتأكد من إنهاء الجميع
+            const promises = Array.from(files).map(file => {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const info = parseFontInfo(file.name);
+                        resolve({
+                            id: file.name,
+                            family: info.family,
+                            weightName: info.weightName,
+                            weightVal: info.weightVal,
+                            data: event.target.result
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            const fontObjects = await Promise.all(promises);
+            saveMultipleFontsToDB(fontObjects);
+        });
+
+        function saveMultipleFontsToDB(fonts) {
+            const transaction = db.transaction(['fonts'], 'readwrite');
+            const store = transaction.objectStore('fonts');
+            
+            fonts.forEach(font => store.put(font));
+            
+            transaction.oncomplete = function() {
+                document.getElementById('add-font-btn').textContent = '➕ رفع';
+                // تحميل الخطوط وتحديد أول عائلة تمت إضافتها
+                loadSavedFonts(fonts[0].family);
+            };
+        }
+
+        function loadSavedFonts(familyToSelect = null) {
+            const transaction = db.transaction(['fonts'], 'readonly');
+            const store = transaction.objectStore('fonts');
+            const request = store.getAll();
+            
+            request.onsuccess = function(e) {
+                const fonts = e.target.result;
+                let css = "";
+                fontFamiliesMap = {};
+                
+                fonts.forEach(font => {
+                    css += `@font-face { font-family: '${font.family}'; src: url('${font.data}'); font-weight: ${font.weightVal}; }\n`;
+                    
+                    if (!fontFamiliesMap[font.family]) {
+                        fontFamiliesMap[font.family] = [];
+                    }
+                    fontFamiliesMap[font.family].push({ name: font.weightName, val: font.weightVal });
+                });
+                
+                dynamicFontsStyle.innerHTML = css;
+                
+                // ترتيب الأوزان تصاعدياً داخل كل عائلة
+                Object.keys(fontFamiliesMap).forEach(fam => {
+                    fontFamiliesMap[fam].sort((a, b) => a.val - b.val);
+                });
+                
+                let optionsHtml = `
+                    <option value="Arial, sans-serif">الافتراضي (Arial)</option>
+                    <option value="'Segoe UI', Tahoma, sans-serif">Segoe UI</option>
+                    <option value="'Times New Roman', Times, serif">Times New Roman</option>
+                `;
+                
+                Object.keys(fontFamiliesMap).forEach(fam => {
+                    optionsHtml += `<option value="${fam}">${fam}</option>`;
+                });
+                
+                const currentVal = familyToSelect || fontSelector.value;
+                fontSelector.innerHTML = optionsHtml;
+                
+                let found = false;
+                for(let i = 0; i < fontSelector.options.length; i++) {
+                    if(fontSelector.options[i].value === currentVal) {
+                        fontSelector.selectedIndex = i;
+                        found = true;
+                        break;
+                    }
+                }
+                
+                updateWeightSelector();
+            };
+        }
+
+        function updateWeightSelector() {
+            const selectedFamily = fontSelector.value;
+            const currentWeight = weightSelector.value; 
+            
+            let weightOptions = '';
+            
+            if (fontFamiliesMap[selectedFamily]) {
+                fontFamiliesMap[selectedFamily].forEach(w => {
+                    weightOptions += `<option value="${w.val}">${w.name} (${w.val})</option>`;
+                });
+            } else {
+                weightOptions = `
+                    <option value="400">عادي (Regular)</option>
+                    <option value="700">عريض (Bold)</option>
+                `;
+            }
+            
+            weightSelector.innerHTML = weightOptions;
+            
+            let weightFound = false;
+            for(let i=0; i<weightSelector.options.length; i++) {
+                if(weightSelector.options[i].value === currentWeight) {
+                    weightSelector.selectedIndex = i;
+                    weightFound = true;
+                    break;
+                }
+            }
+            
+            if (!weightFound && weightSelector.options.length > 0) {
+                // محاولة اختيار العادي لو موجود، وإلا اختيار أول وزن متاح
+                let regularIdx = 0;
+                for(let i=0; i<weightSelector.options.length; i++) {
+                    if(weightSelector.options[i].value === "400") regularIdx = i;
+                }
+                weightSelector.selectedIndex = regularIdx;
+            }
+
+            updateTextareasFont();
+        }
+
+        fontSelector.addEventListener('change', () => {
+            updateWeightSelector();
+            if(document.getElementById('output-text').innerHTML.trim() !== '') {
+                processTextWeb(); 
+            }
+        });
+
+        weightSelector.addEventListener('change', () => {
+            updateTextareasFont();
+            if(document.getElementById('output-text').innerHTML.trim() !== '') {
+                processTextWeb();
+            }
+        });
+
+        function updateTextareasFont() {
+            const font = fontSelector.value;
+            const weight = weightSelector.value;
+            
+            document.getElementById('input-text').style.fontFamily = font;
+            document.getElementById('output-text').style.fontFamily = font;
+            document.getElementById('input-text').style.fontWeight = weight;
+            document.getElementById('output-text').style.fontWeight = weight;
+            
+            document.querySelectorAll('.history-text').forEach(el => {
+                el.style.fontFamily = font;
+                el.style.fontWeight = weight;
+            });
+        }
+
+        document.getElementById('opentype-ligatures').addEventListener('change', function() {
+            const outBox = document.getElementById('output-text');
+            if (this.checked) {
+                outBox.style.fontVariantLigatures = 'contextual common-ligatures';
+                outBox.style.fontFeatureSettings = '"liga" 1, "clig" 1, "calt" 1';
+            } else {
+                outBox.style.fontVariantLigatures = 'none';
+                outBox.style.fontFeatureSettings = '"liga" 0, "clig" 0, "calt" 0';
+            }
+            if(outBox.innerHTML.trim() !== '') {
+                processTextWeb(); 
+            }
+        });
+
+
+        // ==========================================
+        // 2. المحرك الأساسي للكشيدة
+        // ==========================================
+        const measureDiv = document.createElement('div');
+        measureDiv.style.position = 'absolute';
+        measureDiv.style.visibility = 'hidden';
+        measureDiv.style.whiteSpace = 'nowrap';
+        document.body.appendChild(measureDiv);
+
+        function measureText(text, element) {
+            measureDiv.style.fontFamily = window.getComputedStyle(element).fontFamily;
+            measureDiv.style.fontSize = window.getComputedStyle(element).fontSize;
+            measureDiv.style.fontWeight = window.getComputedStyle(element).fontWeight;
+            measureDiv.style.fontVariantLigatures = window.getComputedStyle(element).fontVariantLigatures;
+            measureDiv.style.fontFeatureSettings = window.getComputedStyle(element).fontFeatureSettings;
+            
+            measureDiv.textContent = text || '.'; 
+            return measureDiv.clientWidth;
+        }
+
+        const ARABIC = {
+            kashidaChar: "\u0640",
+            disconnected: ['\u0627', '\u0623', '\u0625', '\u0622', '\u0671', '\u062F', '\u0630', '\u0631', '\u0632', '\u0648', '\u0649', '\u0698'],
+            priority1After: ['\u0633', '\u0634', '\u0635', '\u0636'], 
+            priority2Before: ['\u062F', '\u0647', '\u0629', '\u062A'], 
+            priority3Before: ['\u0627', '\u0623', '\u0625', '\u0622', '\u0643'], 
+            priority4Before: ['\u0641', '\u0642', '\u0639', '\u0648'], 
+            toothedLetters: ['\u0628', '\u062A', '\u062B', '\u0646', '\u064A'], 
+            roundedLetters: ['\u0645', '\u0641', '\u0642'], 
+            noKashidaAfter: ['\u0643'], 
+            noKashidaBefore: ['\u0644', '\u064A'], 
+            forbiddenWords: ['على', 'إلى', 'الى', 'إلا', 'الا', 'هذا', 'هذه', 'ذلك', 'تلك', 'عن', 'من', 'ما', 'لا', 'أن', 'إن', 'أو', 'في', 'كل', 'كان', 'له', 'لك', 'لي', 'بك', 'بي', 'هو', 'هي', 'أنا', 'نحن', 'هم'],
+            kurdishLetters: ['\u067E', '\u0686', '\u06A4', '\u06AF', '\u0695', '\u06B5', '\u06C6', '\u06CE', '\u06D5'],
+            kurdishExtendable: ['\u067E', '\u0686', '\u06A4', '\u06AF', '\u06B5', '\u06CE'],
+            kurdishNoExtend: ['\u06C6', '\u06D5', '\u0695']
+        };
+
+        function trim(str) { return str.replace(/^\s+|\s+$/g, ''); }
+        
+        function isArabicChar(ch) {
+            if(!ch) return false;
+            const code = ch.charCodeAt(0);
+            return (code >= 0x0600 && code <= 0x06FF) || (code >= 0x0750 && code <= 0x077F) || (code >= 0x08A0 && code <= 0x08FF) || (code >= 0xFB50 && code <= 0xFDFF) || (code >= 0xFE70 && code <= 0xFEFF);
+        }
+
+        function isPunctuation(ch) {
+            if(!ch) return false;
+            const punctuation = '.,;:!?\u060C\u061B\u061F-_()[]{}"\'\u00AB\u00BB\u2018\u2019\u201C\u201D';
+            return punctuation.indexOf(ch) !== -1;
+        }
+
+        function removeDiacritics(text) {
+            return text.replace(/[\u064B-\u0652\u0653-\u065F\u0670]/g, '');
+        }
+
+        function canPlaceKashida(word, position, kurdishMode) {
+            if (position < 0 || position >= word.length - 1) return false;
+            const cleanWord = trim(word).toLowerCase();
+            if (ARABIC.forbiddenWords.includes(cleanWord)) return false;
+            if (trim(word).length < 3) return false;
+
+            const current = word.charAt(position);
+            const next = word.charAt(position + 1);
+
+            if (!isArabicChar(current) || !isArabicChar(next)) return false;
+            if (isPunctuation(current) || isPunctuation(next)) return false;
+
+            if (kurdishMode) {
+                if (ARABIC.kurdishNoExtend.includes(current)) return false;
+                if (next === '\u06CE' && position === word.length - 2) return false;
+            }
+
+            if (ARABIC.disconnected.includes(current)) return false;
+            if (position === 0) return false;
+            if (ARABIC.noKashidaAfter.includes(current)) return false;
+            
+            const LAM = '\u0644';
+            if (current === LAM || next === LAM) return false;
+
+            const isAlef = ['\u0627', '\u0623', '\u0625', '\u0622'].includes(current);
+            const nextIsAlef = ['\u0627', '\u0623', '\u0625', '\u0622'].includes(next);
+
+            if ((isAlef && next === LAM) || (current === LAM && nextIsAlef)) return false;
+            if (next === '\u064A' || next === '\u0629') return false;
+
+            return true;
+        }
+
+        function getPositionPriority(word, position, kurdishMode) {
+            if (!canPlaceKashida(word, position, kurdishMode)) return -1;
+            const current = word.charAt(position);
+            const next = word.charAt(position + 1);
+            let priority = 1;
+
+            if (kurdishMode) {
+                if (ARABIC.kurdishExtendable.includes(current)) priority += 12;
+                if (ARABIC.kurdishExtendable.includes(next)) priority += 7;
+            }
+
+            if (ARABIC.priority1After.includes(current)) priority += 10;
+            if (ARABIC.priority2Before.includes(next)) priority += 8;
+            if (ARABIC.priority3Before.includes(next)) priority += 6;
+            if (ARABIC.priority4Before.includes(next)) priority += 4;
+            
+            return priority;
+        }
+
+        function findKashidaPositions(word, maxPositions, kurdishMode, randomize) {
+            let candidates = [];
+            for (let i = 0; i < word.length - 1; i++) {
+                let priority = getPositionPriority(word, i, kurdishMode);
+                if (priority > 0) candidates.push({ position: i, priority: priority });
+            }
+            
+            if (randomize) {
+                candidates.sort(() => Math.random() - 0.5);
+            } else {
+                candidates.sort((a, b) => b.priority - a.priority);
+            }
+            
+            let positions = candidates.slice(0, maxPositions).map(c => c.position);
+            positions.sort((a, b) => a - b); 
+            return positions;
+        }
+
+        function insertKashida(word, positions, count) {
+            if (positions.length === 0 || count <= 0) return word;
+            let perPosition = Math.floor(count / positions.length);
+            let remainder = count % positions.length;
+            let result = [];
+            let lastIndex = 0;
+
+            for (let i = 0; i < positions.length; i++) {
+                let pos = positions[i];
+                result.push(word.substring(lastIndex, pos + 1));
+                let kashidaCount = perPosition + (i < remainder ? 1 : 0);
+                for (let k = 0; k < kashidaCount; k++) result.push(ARABIC.kashidaChar);
+                lastIndex = pos + 1;
+            }
+            result.push(word.substring(lastIndex));
+            return result.join('');
+        }
+
+        let generationHistory = [];
+
+        function updateHistoryUI() {
+            const container = document.getElementById('history-container');
+            const list = document.getElementById('history-list');
+            
+            if (generationHistory.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+            
+            container.style.display = 'block';
+            list.innerHTML = '';
+            
+            const currentFont = fontSelector.value;
+            const currentWeight = weightSelector.value;
+
+            for(let i = generationHistory.length - 1; i >= 0; i--) {
+                let itemHtml = generationHistory[i];
+                let itemDiv = document.createElement('div');
+                itemDiv.className = 'history-item';
+                
+                let textDiv = document.createElement('div');
+                textDiv.className = 'history-text';
+                textDiv.style.fontFamily = currentFont; 
+                textDiv.style.fontWeight = currentWeight;
+                textDiv.innerHTML = itemHtml;
+                
+                let copyBtn = document.createElement('button');
+                copyBtn.textContent = '📋 نسخ';
+                copyBtn.className = 'btn-secondary copy-history-btn';
+                copyBtn.onclick = function() {
+                    navigator.clipboard.writeText(textDiv.innerText).then(() => {
+                        let originalText = copyBtn.textContent;
+                        copyBtn.textContent = '✔️ تم النسخ';
+                        copyBtn.classList.add('btn-success');
+                        setTimeout(() => {
+                            copyBtn.textContent = originalText;
+                            copyBtn.classList.remove('btn-success');
+                        }, 1000);
+                    });
+                };
+                
+                itemDiv.appendChild(textDiv);
+                itemDiv.appendChild(copyBtn);
+                list.appendChild(itemDiv);
+            }
+        }
+
+        function processTextWeb() {
+            const inputText = document.getElementById('input-text').value;
+            const outputBox = document.getElementById('output-text');
+            const applyBtn = document.getElementById('apply-btn');
+            
+            if(!inputText.trim()) {
+                outputBox.innerHTML = '';
+                return;
+            }
+
+            applyBtn.textContent = 'تم التطبيق ✔️';
+            applyBtn.classList.add('btn-success');
+            setTimeout(() => {
+                applyBtn.textContent = 'تطبيق الكشيدة';
+                applyBtn.classList.remove('btn-success');
+            }, 1000);
+
+            const style = window.getComputedStyle(outputBox);
+            const paddingX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+            const maxContainerWidth = outputBox.clientWidth - paddingX;
+            
+            const alignMode = document.getElementById('alignment-mode').value;
+            const maxPerWord = parseInt(document.getElementById('max-kashida').value);
+            const kurdishMode = document.getElementById('kurdish-mode').checked;
+            const forceLastLine = document.getElementById('force-last-line').checked;
+            const isRandomMode = document.getElementById('random-mode').checked;
+
+            const cleanInput = inputText.replace(new RegExp(ARABIC.kashidaChar, 'g'), '');
+            const paragraphs = cleanInput.split(/\n/);
+            
+            let finalHtml = '';
+
+            if (alignMode === 'manual') {
+                paragraphs.forEach(para => {
+                    if(trim(para).length === 0) {
+                        finalHtml += '<br>';
+                        return;
+                    }
+                    const words = para.split(' ').filter(w => trim(w).length > 0);
+                    let lineWords = [...words];
+                    
+                    lineWords.forEach((word, wIdx) => {
+                        let positions = findKashidaPositions(removeDiacritics(word), maxPerWord, kurdishMode, isRandomMode);
+                        if(positions.length > 0) {
+                            lineWords[wIdx] = insertKashida(word, positions, maxPerWord);
+                        }
+                    });
+                    
+                    finalHtml += `<div>${lineWords.join(' ')}</div>`;
+                });
+            } 
+            else {
+                let allLines = [];
+                paragraphs.forEach(para => {
+                    if(trim(para).length === 0) {
+                        allLines.push({ words: [], isLastInPara: true });
+                        return;
+                    }
+
+                    const words = para.split(' ').filter(w => trim(w).length > 0);
+                    let currentLine = [];
+
+                    for(let i=0; i<words.length; i++) {
+                        let testLine = currentLine.concat(words[i]).join(' ');
+                        let testWidth = measureText(testLine, outputBox);
+                        
+                        if(testWidth > maxContainerWidth && currentLine.length > 0) {
+                            allLines.push({ words: [...currentLine], isLastInPara: false });
+                            currentLine = [words[i]];
+                        } else {
+                            currentLine.push(words[i]);
+                        }
+                    }
+                    if(currentLine.length > 0) {
+                        allLines.push({ words: currentLine, isLastInPara: true });
+                    }
+                });
+
+                let actualTargetWidth = 0;
+                let longestLineIndex = -1;
+                
+                if (alignMode === 'box') {
+                    actualTargetWidth = maxContainerWidth;
+                } else {
+                    allLines.forEach((line, index) => {
+                        let w = measureText(line.words.join(' '), outputBox);
+                        if(w > actualTargetWidth) {
+                            actualTargetWidth = w;
+                            longestLineIndex = index;
+                        }
+                    });
+                }
+
+                allLines.forEach((line, index) => {
+                    if(line.words.length === 0) {
+                        finalHtml += '<br>';
+                        return;
+                    }
+
+                    let lineStr = line.words.join(' ');
+                    
+                    if (alignMode === 'longest' && index === longestLineIndex) {
+                        finalHtml += `<div>${lineStr}</div>`;
+                        return;
+                    }
+
+                    if(line.isLastInPara && !forceLastLine) {
+                        finalHtml += `<div>${lineStr}</div>`;
+                        return; 
+                    }
+
+                    let currentWidth = measureText(lineStr, outputBox);
+                    let gap = actualTargetWidth - currentWidth;
+
+                    if(gap > 5) {
+                        let lineWords = [...line.words];
+                        let wordData = [];
+                        lineWords.forEach((word, wIdx) => {
+                            let positions = findKashidaPositions(removeDiacritics(word), maxPerWord, kurdishMode, isRandomMode);
+                            if(positions.length > 0) {
+                                wordData.push({
+                                    index: wIdx,
+                                    original: word,
+                                    positions: positions,
+                                    currentKashida: 0,
+                                    maxKashida: maxPerWord 
+                                });
+                            }
+                        });
+
+                        let attempts = 0;
+                        let maxAttempts = gap * 2; 
+
+                        while(gap > 0 && attempts < maxAttempts) {
+                            attempts++;
+                            
+                            let availableWords = wordData.filter(w => w.currentKashida < w.maxKashida);
+                            
+                            if (availableWords.length === 0) {
+                                wordData.forEach(w => w.maxKashida += 1);
+                                availableWords = wordData;
+                            }
+                            
+                            if (availableWords.length === 0) break;
+
+                            availableWords.sort((a,b) => a.currentKashida - b.currentKashida);
+                            let targetWord;
+                            
+                            if (isRandomMode) {
+                                let minKashidaCount = availableWords[0].currentKashida;
+                                let candidates = availableWords.filter(w => w.currentKashida === minKashidaCount);
+                                let randomIndex = Math.floor(Math.random() * candidates.length);
+                                targetWord = candidates[randomIndex];
+                            } else {
+                                targetWord = availableWords[0];
+                            }
+
+                            targetWord.currentKashida++;
+                            lineWords[targetWord.index] = insertKashida(targetWord.original, targetWord.positions, targetWord.currentKashida);
+                            
+                            let newWidth = measureText(lineWords.join(' '), outputBox);
+                            if(newWidth > actualTargetWidth) {
+                                targetWord.currentKashida--;
+                                lineWords[targetWord.index] = insertKashida(targetWord.original, targetWord.positions, targetWord.currentKashida);
+                                break;
+                            }
+                            gap = actualTargetWidth - newWidth;
+                        }
+                        finalHtml += `<div>${lineWords.join(' ')}</div>`;
+                    } else {
+                        finalHtml += `<div>${lineStr}</div>`;
+                    }
+                });
+            }
+
+            outputBox.innerHTML = finalHtml;
+
+            if (finalHtml.trim() !== '') {
+                if (generationHistory.length === 0 || generationHistory[generationHistory.length - 1] !== finalHtml) {
+                    generationHistory.push(finalHtml);
+                    if(generationHistory.length > 3) {
+                        generationHistory.shift(); 
+                    }
+                    updateHistoryUI();
+                }
+            }
+        }
+
+        document.getElementById('copy-main-btn').addEventListener('click', function() {
+            const outputText = document.getElementById('output-text').innerText;
+            if(!outputText) return;
+            
+            navigator.clipboard.writeText(outputText).then(() => {
+                let btn = document.getElementById('copy-main-btn');
+                btn.textContent = '✔️ تم';
+                btn.style.opacity = '1';
+                btn.style.backgroundColor = 'var(--success-color)';
+                btn.style.borderColor = 'var(--success-color)';
+                
+                setTimeout(() => {
+                    btn.textContent = '📋 نسخ';
+                    btn.style.opacity = '';
+                    btn.style.backgroundColor = '';
+                    btn.style.borderColor = '';
+                }, 1500);
+            });
+        });
+
+        document.getElementById('max-kashida').addEventListener('input', function() {
+            document.getElementById('max-val').textContent = this.value;
+        });
+
+        document.getElementById('alignment-mode').addEventListener('change', processTextWeb);
+        document.getElementById('apply-btn').addEventListener('click', processTextWeb);
+        
+        let lastWindowWidth = window.innerWidth;
+        window.addEventListener('resize', () => {
+            if(window.innerWidth !== lastWindowWidth) {
+                lastWindowWidth = window.innerWidth;
+                if(document.getElementById('output-text').innerHTML.trim() !== '') {
+                    clearTimeout(window.resizeTimer);
+                    window.resizeTimer = setTimeout(processTextWeb, 200);
+                }
+            }
+        });
+
+        document.getElementById('remove-btn').addEventListener('click', function() {
+            let txt = document.getElementById('input-text').value;
+            txt = txt.replace(new RegExp(ARABIC.kashidaChar, 'g'), '');
+            txt = removeDiacritics(txt);
+            document.getElementById('input-text').value = txt;
+            document.getElementById('output-text').innerHTML = txt.replace(/\n/g, '<br>');
+        });
+
+    </script>
+</body>
+</html>
