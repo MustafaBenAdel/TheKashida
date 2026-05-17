@@ -962,7 +962,8 @@
             document.getElementById('output-text').innerHTML = txt.replace(/\n/g, '<br>');
         });
 
-        // ==========================================
+         
+                            // ==========================================
         // 3. الربط المباشر مع Photopea (Live Messaging)
         // ==========================================
         window.addEventListener("message", function(e) {
@@ -985,8 +986,8 @@
         });
 
         document.getElementById('read-photopea-btn').addEventListener('click', function() {
-            // تم إصلاح LayerType إلى LayerKind، وكتابة السكربت في سطر واحد لضمان القراءة السليمة
-            const script = "try { if (app.documents.length > 0 && app.activeDocument.activeLayer.kind == LayerKind.TEXT) { app.echoToOE(app.activeDocument.activeLayer.textItem.contents); } else { app.echoToOE('ERROR_NO_TEXT_LAYER'); } } catch(e) { app.echoToOE('ERROR_NO_TEXT_LAYER'); }";
+            // فحص أكثر أماناً لضمان عدم توقف السكربت
+            const script = "try { var doc = app.activeDocument; var layer = doc.activeLayer; if (layer && layer.textItem) { app.echoToOE(layer.textItem.contents); } else { app.echoToOE('ERROR_NO_TEXT_LAYER'); } } catch(e) { app.echoToOE('ERROR_NO_TEXT_LAYER'); }";
             window.parent.postMessage(script, "*");
         });
 
@@ -1002,7 +1003,6 @@
                 .replace(/\r?\n/g, "\\r")
                 .replace(/"/g, "\\\"");
 
-            // تم إصلاح LayerType إلى LayerKind هنا أيضاً
             const script = `
                 try {
                     if (app.documents.length === 0) {
@@ -1011,7 +1011,7 @@
                     var doc = app.activeDocument;
                     var layer = doc.activeLayer;
                     
-                    if (layer.kind != LayerKind.TEXT) {
+                    if (!layer || !layer.textItem) {
                         layer = doc.artLayers.add();
                         layer.kind = LayerKind.TEXT;
                         layer.textItem.size = 60; 
@@ -1030,6 +1030,7 @@
             sendBtn.innerHTML = "✔️ تم التحديث بنجاح";
             setTimeout(() => sendBtn.innerHTML = originalText, 2000);
         });
+ 
     </script>
 </body>
 </html>
