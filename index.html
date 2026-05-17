@@ -16,6 +16,7 @@
             --btn-bg: #4a4a4a;
             --btn-hover: #5a5a5a;
             --success-color: #2e8b57;
+            --danger-color: #d9534f;
         }
 
         * { box-sizing: border-box; }
@@ -177,6 +178,7 @@
         button:hover { background-color: var(--accent-hover); }
         
         .btn-success { background-color: var(--success-color) !important; }
+        .btn-danger { background-color: var(--danger-color) !important; }
         .btn-secondary { background-color: var(--btn-bg); }
         .btn-secondary:hover { background-color: var(--btn-hover); }
 
@@ -226,6 +228,12 @@
             <h2>أداة تسوية النصوص العربية</h2>
         </div>
 
+        <div class="control-group" style="border: 1px solid var(--success-color); background-color: rgba(46, 139, 87, 0.1);">
+            <div style="font-size: 13px; margin-bottom: 8px; color: #dcdcdc; font-weight: bold;">التحكم المباشر في فوتوبيا:</div>
+            <button id="auto-photopea-btn" style="background-color: var(--success-color); margin-bottom: 8px; padding: 10px; font-size: 16px;">✨ تطبيق الكشيدة بضغطة</button>
+            <button id="remove-photopea-btn" class="btn-danger" style="padding: 10px; font-size: 14px;">❌ إزالة الكشيدة من البرنامج</button>
+        </div>
+
         <div class="control-group" style="border: 1px solid var(--accent-color);">
             <div style="font-size: 13px; margin-bottom: 8px; color: #dcdcdc; font-weight: bold;">مكتبة الخطوط والأوزان:</div>
             
@@ -269,6 +277,10 @@
 
         <div class="control-group">
             <div class="checkbox-group">
+                <input type="checkbox" id="keep-lines-mode" checked>
+                <label for="keep-lines-mode" style="font-size: 14px; color: #64b5f6; font-weight: bold;">الحفاظ على السطور الأصلية (مهم للموبايل)</label>
+            </div>
+            <div class="checkbox-group">
                 <input type="checkbox" id="random-mode" checked>
                 <label for="random-mode" style="font-size: 14px;">توزيع عشوائي (تغيير الشكل)</label>
             </div>
@@ -282,14 +294,9 @@
             </div>
         </div>
 
-        <button id="apply-btn">تطبيق الكشيدة</button>
-        <button id="remove-btn" class="btn-secondary">إزالة الكشيدة</button>
+        <button id="apply-btn">معاينة في الأداة</button>
+        <button id="remove-btn" class="btn-secondary">إزالة المعاينة</button>
 
-        <div class="control-group" style="border: 1px solid var(--success-color); margin-top: 10px; background-color: rgba(46, 139, 87, 0.1);">
-            <div style="font-size: 13px; margin-bottom: 8px; color: #dcdcdc; font-weight: bold;">الربط المباشر مع فوتوبيا:</div>
-            <button id="read-photopea-btn" class="btn-secondary" style="margin-bottom: 8px; padding: 10px;">📥 1. سحب النص من البرنامج</button>
-            <button id="send-photopea-btn" style="background-color: var(--success-color); padding: 10px;">📤 2. تحديث لاير النص</button>
-        </div>
     </div>
 
     <div class="workspace">
@@ -313,7 +320,7 @@
 
     <script>
         // ==========================================
-        // 1. نظام إدارة الخطوط المتقدم (IndexedDB V2)
+        // 1. نظام إدارة الخطوط المتقدم
         // ==========================================
         let db;
         const fontSelector = document.getElementById('font-selector');
@@ -731,19 +738,11 @@
         function processTextWeb() {
             const inputText = document.getElementById('input-text').value;
             const outputBox = document.getElementById('output-text');
-            const applyBtn = document.getElementById('apply-btn');
             
             if(!inputText.trim()) {
                 outputBox.innerHTML = '';
                 return;
             }
-
-            applyBtn.textContent = 'تم التطبيق ✔️';
-            applyBtn.classList.add('btn-success');
-            setTimeout(() => {
-                applyBtn.textContent = 'تطبيق الكشيدة';
-                applyBtn.classList.remove('btn-success');
-            }, 1000);
 
             const style = window.getComputedStyle(outputBox);
             const paddingX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
@@ -754,9 +753,10 @@
             const kurdishMode = document.getElementById('kurdish-mode').checked;
             const forceLastLine = document.getElementById('force-last-line').checked;
             const isRandomMode = document.getElementById('random-mode').checked;
+            const keepOriginalLines = document.getElementById('keep-lines-mode').checked; // الخيار الجديد
 
             const cleanInput = inputText.replace(new RegExp(ARABIC.kashidaChar, 'g'), '');
-            const paragraphs = cleanInput.split(/\n/);
+            const paragraphs = cleanInput.split(/\n/); // تقسيم بناءً على الإنتر فقط
             
             let finalHtml = '';
 
@@ -781,37 +781,51 @@
             } 
             else {
                 let allLines = [];
-                paragraphs.forEach(para => {
-                    if(trim(para).length === 0) {
-                        allLines.push({ words: [], isLastInPara: true });
-                        return;
-                    }
-
-                    const words = para.split(' ').filter(w => trim(w).length > 0);
-                    let currentLine = [];
-
-                    for(let i=0; i<words.length; i++) {
-                        let testLine = currentLine.concat(words[i]).join(' ');
-                        let testWidth = measureText(testLine, outputBox);
-                        
-                        if(testWidth > maxContainerWidth && currentLine.length > 0) {
-                            allLines.push({ words: [...currentLine], isLastInPara: false });
-                            currentLine = [words[i]];
+                
+                // هنا التعديل السحري للموبايل
+                if (keepOriginalLines) {
+                    paragraphs.forEach(para => {
+                        if(trim(para).length === 0) {
+                            allLines.push({ words: [], isLastInPara: true });
                         } else {
-                            currentLine.push(words[i]);
+                            allLines.push({ words: para.split(' ').filter(w => trim(w).length > 0), isLastInPara: true });
                         }
-                    }
-                    if(currentLine.length > 0) {
-                        allLines.push({ words: currentLine, isLastInPara: true });
-                    }
-                });
+                    });
+                } else {
+                    // الطريقة القديمة اللي بتكسر السطور بناءً على حجم الشاشة
+                    paragraphs.forEach(para => {
+                        if(trim(para).length === 0) {
+                            allLines.push({ words: [], isLastInPara: true });
+                            return;
+                        }
+
+                        const words = para.split(' ').filter(w => trim(w).length > 0);
+                        let currentLine = [];
+
+                        for(let i=0; i<words.length; i++) {
+                            let testLine = currentLine.concat(words[i]).join(' ');
+                            let testWidth = measureText(testLine, outputBox);
+                            
+                            if(testWidth > maxContainerWidth && currentLine.length > 0) {
+                                allLines.push({ words: [...currentLine], isLastInPara: false });
+                                currentLine = [words[i]];
+                            } else {
+                                currentLine.push(words[i]);
+                            }
+                        }
+                        if(currentLine.length > 0) {
+                            allLines.push({ words: currentLine, isLastInPara: true });
+                        }
+                    });
+                }
 
                 let actualTargetWidth = 0;
                 let longestLineIndex = -1;
                 
-                if (alignMode === 'box') {
+                if (alignMode === 'box' && !keepOriginalLines) {
                     actualTargetWidth = maxContainerWidth;
                 } else {
+                    // قياس أطول سطر موجود بالفعل في الإدخال ومطابقة الباقي به
                     allLines.forEach((line, index) => {
                         let w = measureText(line.words.join(' '), outputBox);
                         if(w > actualTargetWidth) {
@@ -916,6 +930,17 @@
             }
         }
 
+        document.getElementById('apply-btn').addEventListener('click', () => {
+            processTextWeb();
+            const applyBtn = document.getElementById('apply-btn');
+            applyBtn.textContent = 'تم المعاينة ✔️';
+            applyBtn.classList.add('btn-success');
+            setTimeout(() => {
+                applyBtn.textContent = 'معاينة في الأداة';
+                applyBtn.classList.remove('btn-success');
+            }, 1000);
+        });
+
         document.getElementById('copy-main-btn').addEventListener('click', function() {
             const outputText = document.getElementById('output-text').innerText;
             if(!outputText) return;
@@ -941,7 +966,7 @@
         });
 
         document.getElementById('alignment-mode').addEventListener('change', processTextWeb);
-        document.getElementById('apply-btn').addEventListener('click', processTextWeb);
+        document.getElementById('keep-lines-mode').addEventListener('change', processTextWeb);
         
         let lastWindowWidth = window.innerWidth;
         window.addEventListener('resize', () => {
@@ -962,41 +987,15 @@
             document.getElementById('output-text').innerHTML = txt.replace(/\n/g, '<br>');
         });
 
-         
-                            // ==========================================
+        // ==========================================
         // 3. الربط المباشر مع Photopea (Live Messaging)
         // ==========================================
-        window.addEventListener("message", function(e) {
-            if (e.data === "done") return;
-            
-            if (e.data === "ERROR_NO_TEXT_LAYER") {
-                alert("يرجى تحديد لاير نص (Text Layer) داخل البرنامج أولاً!");
-                return;
-            }
+        let autoPushToPhotopea = false;
 
-            if (typeof e.data === "string") {
-                document.getElementById('input-text').value = e.data;
-                processTextWeb(); // تطبيق الكشيدة فوراً
-                
-                const readBtn = document.getElementById('read-photopea-btn');
-                const originalText = readBtn.innerHTML;
-                readBtn.innerHTML = "✔️ تم سحب النص";
-                setTimeout(() => readBtn.innerHTML = originalText, 2000);
-            }
-        });
-
-        document.getElementById('read-photopea-btn').addEventListener('click', function() {
-            // فحص أكثر أماناً لضمان عدم توقف السكربت
-            const script = "try { var doc = app.activeDocument; var layer = doc.activeLayer; if (layer && layer.textItem) { app.echoToOE(layer.textItem.contents); } else { app.echoToOE('ERROR_NO_TEXT_LAYER'); } } catch(e) { app.echoToOE('ERROR_NO_TEXT_LAYER'); }";
-            window.parent.postMessage(script, "*");
-        });
-
-        document.getElementById('send-photopea-btn').addEventListener('click', function() {
+        // دالة مخصصة لإرسال النتيجة إلى فوتوبيا
+        function pushTextToPhotopea() {
             const outputText = document.getElementById('output-text').innerText;
-            if (!outputText.trim()) {
-                alert("لا يوجد نص منسق لإرساله! قم بسحب نص وتطبيق الكشيدة أولاً.");
-                return;
-            }
+            if (!outputText.trim()) return;
 
             const escapedText = outputText
                 .replace(/\\/g, "\\\\")
@@ -1005,32 +1004,80 @@
 
             const script = `
                 try {
-                    if (app.documents.length === 0) {
-                        app.documents.add();
+                    if (app.documents.length > 0) {
+                        var doc = app.activeDocument;
+                        var layer = doc.activeLayer;
+                        if (layer && layer.textItem) {
+                            layer.textItem.contents = "${escapedText}";
+                        }
                     }
-                    var doc = app.activeDocument;
-                    var layer = doc.activeLayer;
-                    
-                    if (!layer || !layer.textItem) {
-                        layer = doc.artLayers.add();
-                        layer.kind = LayerKind.TEXT;
-                        layer.textItem.size = 60; 
-                    }
-                    
-                    layer.textItem.contents = "${escapedText}";
-                } catch(e) {
-                    // تجاهل الأخطاء الصامتة
-                }
+                } catch(e) {}
             `;
-            
             window.parent.postMessage(script, "*");
             
-            const sendBtn = document.getElementById('send-photopea-btn');
-            const originalText = sendBtn.innerHTML;
-            sendBtn.innerHTML = "✔️ تم التحديث بنجاح";
-            setTimeout(() => sendBtn.innerHTML = originalText, 2000);
+            const btn = document.getElementById('auto-photopea-btn');
+            const originalText = "✨ تطبيق الكشيدة بضغطة";
+            btn.innerHTML = "✔️ تم التحديث بنجاح";
+            setTimeout(() => btn.innerHTML = originalText, 2000);
+        }
+
+        // استقبال الرسائل ومعالجتها
+        window.addEventListener("message", function(e) {
+            if (e.data === "done") return;
+            
+            if (e.data === "ERROR_NO_TEXT_LAYER") {
+                alert("يرجى تحديد لاير نص (Text Layer) داخل البرنامج أولاً!");
+                autoPushToPhotopea = false;
+                const btn = document.getElementById('auto-photopea-btn');
+                btn.innerHTML = "✨ تطبيق الكشيدة بضغطة";
+                return;
+            }
+
+            if (typeof e.data === "string") {
+                document.getElementById('input-text').value = e.data;
+                processTextWeb(); // معالجة النص
+                
+                // إذا كان الطلب من زر التطبيق المباشر، نقوم بالإرسال فوراً
+                if (autoPushToPhotopea) {
+                    setTimeout(() => {
+                        pushTextToPhotopea();
+                        autoPushToPhotopea = false;
+                    }, 100); 
+                }
+            }
         });
- 
+
+        // 1. زر التطبيق بضغطة واحدة (سحب -> معالجة -> إرسال)
+        document.getElementById('auto-photopea-btn').addEventListener('click', function() {
+            autoPushToPhotopea = true; // تفعيل إشارة الإرسال التلقائي
+            const script = "try { var doc = app.activeDocument; var layer = doc.activeLayer; if (layer && layer.textItem) { app.echoToOE(layer.textItem.contents); } else { app.echoToOE('ERROR_NO_TEXT_LAYER'); } } catch(e) { app.echoToOE('ERROR_NO_TEXT_LAYER'); }";
+            window.parent.postMessage(script, "*");
+            
+            this.innerHTML = "⏳ جاري التطبيق...";
+        });
+
+        // 2. زر إزالة الكشيدة من فوتوبيا مباشرة
+        document.getElementById('remove-photopea-btn').addEventListener('click', function() {
+            const script = `
+                try {
+                    var doc = app.activeDocument;
+                    var layer = doc.activeLayer;
+                    if (layer && layer.textItem) {
+                        layer.textItem.contents = layer.textItem.contents.replace(/\\u0640/g, '');
+                    } else {
+                        app.echoToOE('ERROR_NO_TEXT_LAYER');
+                    }
+                } catch(e) {
+                    app.echoToOE('ERROR_NO_TEXT_LAYER');
+                }
+            `;
+            window.parent.postMessage(script, "*");
+            
+            const originalText = this.innerHTML;
+            this.innerHTML = "✔️ تمت الإزالة";
+            setTimeout(() => this.innerHTML = originalText, 1500);
+        });
+
     </script>
 </body>
 </html>
