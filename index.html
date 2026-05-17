@@ -136,8 +136,17 @@
         .btn-secondary { background-color: var(--btn-bg); }
         .btn-secondary:hover { background-color: var(--btn-hover); }
 
-        #toast-notification {
-            display: none; padding: 12px; border-radius: 6px; font-size: 14px; font-weight: bold; text-align: center; margin-bottom: 10px; transition: 0.3s;
+        /* ستايل صندوق حالة المحرك */
+        #engine-status {
+            display: none; 
+            margin-top: 10px; 
+            padding: 10px; 
+            border-radius: 5px; 
+            font-size: 13px; 
+            font-weight: bold; 
+            text-align: center; 
+            line-height: 1.6;
+            transition: all 0.3s ease;
         }
 
         @media (min-width: 768px) {
@@ -160,6 +169,8 @@
             <div style="font-size: 13px; margin-bottom: 8px; color: #dcdcdc; font-weight: bold;">التحكم المباشر في فوتوبيا:</div>
             <button id="auto-photopea-btn" style="background-color: var(--success-color); margin-bottom: 8px; padding: 10px; font-size: 16px;">✨ تطبيق الكشيدة بضغطة</button>
             <button id="remove-photopea-btn" class="btn-danger" style="padding: 10px; font-size: 14px;">❌ إزالة الكشيدة من البرنامج</button>
+            
+            <div id="engine-status"></div>
         </div>
 
         <div class="control-group">
@@ -215,7 +226,7 @@
     </div>
 
     <div class="workspace">
-        <div id="toast-notification"></div> <div class="text-area-container">
+        <div class="text-area-container">
             <label style="font-size: 14px; color: #aaa;">النص الأصلي (اضغط Enter لفصل السطور):</label>
             <textarea id="input-text" placeholder="اكتب النص هنا..."></textarea>
         </div>
@@ -232,20 +243,23 @@
         // ==========================================
         // النظام الهجين (Hybrid Settings)
         // ==========================================
-        let activeEngine = 'pixel'; // الافتراضي هو المحرك الدقيق
+        let activeEngine = 'pixel'; // الافتراضي
 
-        function showToast(msg, type) {
-            const toast = document.getElementById('toast-notification');
-            toast.textContent = msg;
-            toast.style.display = 'block';
-            if(type === 'success') {
-                toast.style.backgroundColor = 'rgba(46, 139, 87, 0.2)';
-                toast.style.border = '1px solid var(--success-color)';
-                toast.style.color = '#a8e6cf';
+        // دالة تحديث صندوق الحالة أسفل الأزرار
+        function updateEngineStatus(engine, fontName) {
+            const statusBox = document.getElementById('engine-status');
+            statusBox.style.display = 'block';
+            
+            if (engine === 'pixel') {
+                statusBox.innerHTML = `✔️ تم تطبيق: <b>المحرك الدقيق</b><br><span style="font-size: 11.5px; font-weight: normal; color: #e0e0e0;">(تم التعرف على الخط: ${fontName})</span>`;
+                statusBox.style.backgroundColor = 'rgba(46, 139, 87, 0.2)';
+                statusBox.style.border = '1px solid var(--success-color)';
+                statusBox.style.color = '#a8e6cf';
             } else {
-                toast.style.backgroundColor = 'rgba(217, 142, 4, 0.2)';
-                toast.style.border = '1px solid var(--warning-color)';
-                toast.style.color = '#ffd880';
+                statusBox.innerHTML = `⚠️ تم تطبيق: <b>محرك الكثافة التقريبي</b><br><span style="font-size: 11.5px; font-weight: normal; color: #e0e0e0;">(الخط: ${fontName} غير مرفوع بالأداة)</span>`;
+                statusBox.style.backgroundColor = 'rgba(217, 142, 4, 0.2)';
+                statusBox.style.border = '1px solid var(--warning-color)';
+                statusBox.style.color = '#ffd880';
             }
         }
 
@@ -304,8 +318,7 @@
             transaction.oncomplete = function() {
                 document.getElementById('add-font-btn').textContent = '➕ رفع';
                 loadSavedFonts(fonts[0].family);
-                activeEngine = 'pixel'; // التبديل للمحرك الدقيق فور رفع خط
-                showToast("تم رفع الخط بنجاح وتفعيل المحرك الدقيق", "success");
+                activeEngine = 'pixel';
             };
         }
 
@@ -452,7 +465,6 @@
             return priority;
         }
 
-        // خوارزمية Fisher-Yates للعشوائية الحقيقية
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -499,7 +511,7 @@
             const kurdishMode = document.getElementById('kurdish-mode').checked;
             const forceLastLine = document.getElementById('force-last-line').checked;
             const isRandomMode = document.getElementById('random-mode').checked;
-            const isFillBox = document.getElementById('fill-box-mode').checked; // ميزة التمديد لملء المساحة
+            const isFillBox = document.getElementById('fill-box-mode').checked;
 
             const cleanInput = inputText.replace(new RegExp(ARABIC.kashidaChar, 'g'), '');
             const paragraphs = cleanInput.split(/\n/);
@@ -529,7 +541,6 @@
                     if(w > longestLineWidth) { longestLineWidth = w; longestLineIndex = index; }
                 });
 
-                // إذا كان الخيار "ملء الـ Text Box" مفعلاً، الهدف سيكون عرض الصندوق بالكامل، وإلا سيكون طول أطول سطر
                 let actualTargetWidth = isFillBox ? maxContainerWidth : longestLineWidth;
 
                 allLines.forEach((line, index) => {
@@ -585,7 +596,6 @@
                     if(w > targetWeight) { targetWeight = w; longestLineIndex = index; }
                 });
 
-                // إذا كان خيار ملء التيكست بوكس مفعلاً، نزيد الوزن بنسبة 35% ليجبر السطور على التمدد
                 if (isFillBox) targetWeight = targetWeight * 1.35;
 
                 allLines.forEach((line, index) => {
@@ -658,6 +668,7 @@
             let txt = document.getElementById('input-text').value;
             txt = txt.replace(new RegExp(ARABIC.kashidaChar, 'g'), ''); txt = removeDiacritics(txt);
             document.getElementById('input-text').value = txt; document.getElementById('output-text').innerHTML = txt.replace(/\n/g, '<div><br></div>');
+            document.getElementById('engine-status').style.display = 'none'; // إخفاء الصندوق عند مسح النص
         });
 
         // ==========================================
@@ -682,16 +693,15 @@
                 alert("يرجى تحديد لاير نص (Text Layer) داخل البرنامج أولاً!");
                 autoPushToPhotopea = false;
                 document.getElementById('auto-photopea-btn').innerHTML = "✨ تطبيق الكشيدة بضغطة";
+                document.getElementById('engine-status').style.display = 'none';
                 return;
             }
 
             try {
                 let layerData = JSON.parse(e.data);
                 if (layerData && layerData.text) {
-                    // ضبط إعدادات الـ Ligatures
                     if (layerData.ligatures !== undefined) document.getElementById('opentype-ligatures').checked = layerData.ligatures;
 
-                    // التعرف الذكي على الخط
                     let fontFound = false;
                     const photopeaFont = layerData.font.toLowerCase();
                     for (let i = 0; i < fontSelector.options.length; i++) {
@@ -704,10 +714,10 @@
                     if (fontFound || photopeaFont === "arial" || photopeaFont.includes("tahoma")) {
                         activeEngine = 'pixel';
                         updateWeightSelector();
-                        showToast(`✔️ تم التعرف على الخط (${layerData.font}) - تشغيل المحرك الدقيق`, 'success');
+                        updateEngineStatus('pixel', layerData.font);
                     } else {
                         activeEngine = 'density';
-                        showToast(`⚠️ الخط (${layerData.font}) غير متوفر - تشغيل محرك الكثافة التقريبي`, 'warning');
+                        updateEngineStatus('density', layerData.font);
                     }
 
                     document.getElementById('input-text').value = layerData.text;
@@ -716,7 +726,6 @@
                     if (autoPushToPhotopea) { setTimeout(() => { pushTextToPhotopea(); autoPushToPhotopea = false; }, 100); }
                 }
             } catch (err) {
-                // نص عادي كاحتياطي
                 if (typeof e.data === "string") {
                     document.getElementById('input-text').value = e.data; processTextWeb();
                     if (autoPushToPhotopea) { setTimeout(() => { pushTextToPhotopea(); autoPushToPhotopea = false; }, 100); }
@@ -735,6 +744,7 @@
             const script = `try { var doc = app.activeDocument; var layer = doc.activeLayer; if (layer && layer.textItem) { layer.textItem.contents = layer.textItem.contents.replace(/\\u0640/g, ''); } else { app.echoToOE('ERROR_NO_TEXT_LAYER'); } } catch(e) { app.echoToOE('ERROR_NO_TEXT_LAYER'); }`;
             window.parent.postMessage(script, "*");
             const originalText = this.innerHTML; this.innerHTML = "✔️ تمت الإزالة";
+            document.getElementById('engine-status').style.display = 'none'; // إخفاء الصندوق عند إزالة الكشيدة
             setTimeout(() => this.innerHTML = originalText, 1500);
         });
 
