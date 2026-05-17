@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kashida Pro - Web Version</title>
-    <style id="dynamic-fonts"></style>
+    <title>Kashida Pro - Smart Engine</title>
     <style>
         :root {
             --bg-color: #323232;
@@ -84,8 +83,6 @@
             white-space: pre-wrap;
             min-height: 250px;
             flex-grow: 1;
-            font-variant-ligatures: contextual common-ligatures;
-            font-feature-settings: "liga" 1, "clig" 1, "calt" 1;
         }
 
         .copy-overlay-btn {
@@ -102,8 +99,6 @@
             opacity: 0.3;
             transition: all 0.3s ease;
             z-index: 10;
-            width: max-content;
-            min-width: unset;
         }
 
         .copy-overlay-btn:hover {
@@ -131,10 +126,7 @@
             font-size: 13px;
         }
 
-        input[type="range"] { 
-            width: 100%; 
-            height: 30px; 
-        }
+        input[type="range"] { width: 100%; height: 30px; }
 
         select {
             width: 100%;
@@ -144,73 +136,34 @@
             border: 1px solid var(--border-color);
             border-radius: 4px;
             font-size: 13px;
-            font-family: inherit;
-            cursor: pointer;
             margin-bottom: 5px;
         }
 
-        select:focus { outline: none; border-color: var(--accent-color); }
-
         .checkbox-group {
-            display: flex; 
-            gap: 10px; 
-            align-items: center;
-            padding: 5px 0;
-            cursor: pointer;
+            display: flex; gap: 10px; align-items: center; padding: 5px 0; cursor: pointer;
         }
-
         input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer;}
         label { cursor: pointer; }
 
         button {
             background-color: var(--accent-color);
-            color: #fff;
-            border: none;
-            padding: 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: bold;
-            transition: 0.2s;
-            width: 100%;
+            color: #fff; border: none; padding: 12px; border-radius: 4px; cursor: pointer;
+            font-size: 15px; font-weight: bold; transition: 0.2s; width: 100%;
         }
-        
         button:hover { background-color: var(--accent-hover); }
-        
         .btn-success { background-color: var(--success-color) !important; }
         .btn-danger { background-color: var(--danger-color) !important; }
         .btn-secondary { background-color: var(--btn-bg); }
         .btn-secondary:hover { background-color: var(--btn-hover); }
 
         .history-container {
-            background-color: var(--panel-bg);
-            padding: 15px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
+            background-color: var(--panel-bg); padding: 15px; border-radius: 6px; border: 1px solid var(--border-color);
         }
         .history-item {
-            background-color: #1e1e1e;
-            padding: 12px;
-            border-radius: 4px;
-            margin-top: 10px;
-            border: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            background-color: #1e1e1e; padding: 12px; border-radius: 4px; margin-top: 10px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 10px;
         }
-        .history-text {
-            font-size: 18px;
-            line-height: 1.8;
-            text-align: right;
-            white-space: pre-wrap;
-        }
-        .copy-history-btn {
-            padding: 8px;
-            font-size: 13px;
-            align-self: flex-end;
-            width: auto;
-            min-width: 100px;
-        }
+        .history-text { font-size: 18px; line-height: 1.8; text-align: right; white-space: pre-wrap; }
+        .copy-history-btn { padding: 8px; font-size: 13px; align-self: flex-end; width: auto; min-width: 100px; }
 
         @media (min-width: 768px) {
             body { flex-direction: row; height: 100vh; overflow: hidden; }
@@ -224,8 +177,8 @@
 
     <div class="sidebar">
         <div>
-            <h1>Kashida Pro (Web)</h1>
-            <h2>أداة تسوية النصوص العربية</h2>
+            <h1>Kashida Pro (Smart Engine)</h1>
+            <h2>محرك الكثافة النسبية (لا يحتاج خطوط)</h2>
         </div>
 
         <div class="control-group" style="border: 1px solid var(--success-color); background-color: rgba(46, 139, 87, 0.1);">
@@ -234,35 +187,10 @@
             <button id="remove-photopea-btn" class="btn-danger" style="padding: 10px; font-size: 14px;">❌ إزالة الكشيدة من البرنامج</button>
         </div>
 
-        <div class="control-group" style="border: 1px solid var(--accent-color);">
-            <div style="font-size: 13px; margin-bottom: 8px; color: #dcdcdc; font-weight: bold;">مكتبة الخطوط والأوزان:</div>
-            
-            <div style="display: flex; gap: 5px; margin-bottom: 5px;">
-                <select id="font-selector" style="flex: 2;" title="عائلة الخط">
-                    <option value="Arial, sans-serif">الافتراضي (Arial)</option>
-                    <option value="'Segoe UI', Tahoma, sans-serif">Segoe UI</option>
-                    <option value="'Times New Roman', Times, serif">Times New Roman</option>
-                </select>
-                <button id="add-font-btn" class="btn-secondary" style="flex: 1; padding: 0;" title="إضافة خطوط (تحديد متعدد)">➕ رفع</button>
-                <input type="file" id="font-upload" accept=".ttf,.otf,.woff,.woff2" style="display:none;" multiple>
-            </div>
-            
-            <select id="font-weight-selector" title="وزن الخط">
-                <option value="400">عادي (Regular)</option>
-                <option value="700">عريض (Bold)</option>
-            </select>
-            
-            <div class="checkbox-group" style="margin-top: 8px;">
-                <input type="checkbox" id="opentype-ligatures" checked>
-                <label for="opentype-ligatures" style="font-size: 13px; color: #aaa;">تفعيل تشابك الحروف (Ligatures)</label>
-            </div>
-        </div>
-
         <div class="control-group">
-            <div style="font-size: 13px; margin-bottom: 8px; color: #dcdcdc;">طريقة المحاذاة والتمديد:</div>
+            <div style="font-size: 13px; margin-bottom: 8px; color: #dcdcdc;">طريقة المحاذاة:</div>
             <select id="alignment-mode">
                 <option value="longest">ذكي (يساوي السطور بأطول سطر)</option>
-                <option value="box">ملء المربع (تمديد لكامل الشاشة)</option>
                 <option value="manual">تمديد حُر (تمديد إجباري حسب المؤشر)</option>
             </select>
         </div>
@@ -276,10 +204,6 @@
         </div>
 
         <div class="control-group">
-            <div class="checkbox-group">
-                <input type="checkbox" id="keep-lines-mode" checked>
-                <label for="keep-lines-mode" style="font-size: 14px; color: #64b5f6; font-weight: bold;">الحفاظ على السطور الأصلية (مهم للموبايل)</label>
-            </div>
             <div class="checkbox-group">
                 <input type="checkbox" id="random-mode" checked>
                 <label for="random-mode" style="font-size: 14px;">توزيع عشوائي (تغيير الشكل)</label>
@@ -296,13 +220,12 @@
 
         <button id="apply-btn">معاينة في الأداة</button>
         <button id="remove-btn" class="btn-secondary">إزالة المعاينة</button>
-
     </div>
 
     <div class="workspace">
         <div class="text-area-container">
-            <label style="font-size: 14px; color: #aaa;">النص الأصلي:</label>
-            <textarea id="input-text" placeholder="اكتب النص هنا ثم اضغط تطبيق..."></textarea>
+            <label style="font-size: 14px; color: #aaa;">النص الأصلي (اضغط Enter لفصل السطور):</label>
+            <textarea id="input-text" placeholder="اكتب النص هنا..."></textarea>
         </div>
         <div class="text-area-container">
             <label style="font-size: 14px; color: #aaa;">النتيجة المنسقة:</label>
@@ -313,256 +236,12 @@
         </div>
 
         <div class="history-container" id="history-container" style="display: none;">
-            <label style="font-size: 14px; color: #aaa;">سجل آخر 3 أشكال (History):</label>
+            <label style="font-size: 14px; color: #aaa;">سجل آخر 3 أشكال:</label>
             <div id="history-list"></div>
         </div>
     </div>
 
     <script>
-        // ==========================================
-        // 1. نظام إدارة الخطوط المتقدم
-        // ==========================================
-        let db;
-        const fontSelector = document.getElementById('font-selector');
-        const weightSelector = document.getElementById('font-weight-selector');
-        const dynamicFontsStyle = document.getElementById('dynamic-fonts');
-        let fontFamiliesMap = {}; 
-        
-        const request = indexedDB.open("KashidaFontsDB_Pro", 2);
-        
-        request.onupgradeneeded = function(e) {
-            db = e.target.result;
-            if (db.objectStoreNames.contains('fonts')) {
-                db.deleteObjectStore('fonts'); 
-            }
-            db.createObjectStore('fonts', { keyPath: 'id' });
-        };
-        
-        request.onsuccess = function(e) {
-            db = e.target.result;
-            loadSavedFonts();
-        };
-
-        function parseFontInfo(fileName) {
-            let nameObj = fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
-            let family = nameObj;
-            let weightName = 'Regular';
-            let weightVal = 400;
-
-            const lower = nameObj.toLowerCase();
-
-            if(lower.includes('thin') || lower.includes('100')) { weightName = 'Thin'; weightVal = 100; }
-            else if(lower.includes('extralight') || lower.includes('ultralight') || lower.includes('200')) { weightName = 'ExtraLight'; weightVal = 200; }
-            else if(lower.includes('light') || lower.includes('300')) { weightName = 'Light'; weightVal = 300; }
-            else if(lower.includes('medium') || lower.includes('500')) { weightName = 'Medium'; weightVal = 500; }
-            else if(lower.includes('semibold') || lower.includes('demibold') || lower.includes('600')) { weightName = 'SemiBold'; weightVal = 600; }
-            else if(lower.includes('extrabold') || lower.includes('ultrabold') || lower.includes('800')) { weightName = 'ExtraBold'; weightVal = 800; }
-            else if(lower.includes('black') || lower.includes('heavy') || lower.includes('900')) { weightName = 'Black'; weightVal = 900; }
-            else if(lower.includes('bold') || lower.includes('700')) { weightName = 'Bold'; weightVal = 700; }
-
-            family = family.replace(new RegExp(`[-_\\s]?(${weightName}|italic|100|200|300|400|500|600|700|800|900)($|[\\s_\\-])`, 'ig'), '');
-            family = family.replace(/[-_]/g, ' ').trim() || 'UnknownFamily';
-            family = family.replace(/[^a-zA-Z0-9\s]/g, '');
-
-            return { family, weightName, weightVal };
-        }
-
-        document.getElementById('add-font-btn').addEventListener('click', () => {
-            document.getElementById('font-upload').click();
-        });
-
-        document.getElementById('font-upload').addEventListener('change', async function(e) {
-            const files = e.target.files;
-            if(files.length === 0) return;
-            
-            document.getElementById('add-font-btn').textContent = '⏳ جاري...';
-            
-            const promises = Array.from(files).map(file => {
-                return new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        const info = parseFontInfo(file.name);
-                        resolve({
-                            id: file.name,
-                            family: info.family,
-                            weightName: info.weightName,
-                            weightVal: info.weightVal,
-                            data: event.target.result
-                        });
-                    };
-                    reader.readAsDataURL(file);
-                });
-            });
-
-            const fontObjects = await Promise.all(promises);
-            saveMultipleFontsToDB(fontObjects);
-        });
-
-        function saveMultipleFontsToDB(fonts) {
-            const transaction = db.transaction(['fonts'], 'readwrite');
-            const store = transaction.objectStore('fonts');
-            
-            fonts.forEach(font => store.put(font));
-            
-            transaction.oncomplete = function() {
-                document.getElementById('add-font-btn').textContent = '➕ رفع';
-                loadSavedFonts(fonts[0].family);
-            };
-        }
-
-        function loadSavedFonts(familyToSelect = null) {
-            const transaction = db.transaction(['fonts'], 'readonly');
-            const store = transaction.objectStore('fonts');
-            const request = store.getAll();
-            
-            request.onsuccess = function(e) {
-                const fonts = e.target.result;
-                let css = "";
-                fontFamiliesMap = {};
-                
-                fonts.forEach(font => {
-                    css += `@font-face { font-family: '${font.family}'; src: url('${font.data}'); font-weight: ${font.weightVal}; }\n`;
-                    
-                    if (!fontFamiliesMap[font.family]) {
-                        fontFamiliesMap[font.family] = [];
-                    }
-                    fontFamiliesMap[font.family].push({ name: font.weightName, val: font.weightVal });
-                });
-                
-                dynamicFontsStyle.innerHTML = css;
-                
-                Object.keys(fontFamiliesMap).forEach(fam => {
-                    fontFamiliesMap[fam].sort((a, b) => a.val - b.val);
-                });
-                
-                let optionsHtml = `
-                    <option value="Arial, sans-serif">الافتراضي (Arial)</option>
-                    <option value="'Segoe UI', Tahoma, sans-serif">Segoe UI</option>
-                    <option value="'Times New Roman', Times, serif">Times New Roman</option>
-                `;
-                
-                Object.keys(fontFamiliesMap).forEach(fam => {
-                    optionsHtml += `<option value="${fam}">${fam}</option>`;
-                });
-                
-                const currentVal = familyToSelect || fontSelector.value;
-                fontSelector.innerHTML = optionsHtml;
-                
-                let found = false;
-                for(let i = 0; i < fontSelector.options.length; i++) {
-                    if(fontSelector.options[i].value === currentVal) {
-                        fontSelector.selectedIndex = i;
-                        found = true;
-                        break;
-                    }
-                }
-                
-                updateWeightSelector();
-            };
-        }
-
-        function updateWeightSelector() {
-            const selectedFamily = fontSelector.value;
-            const currentWeight = weightSelector.value; 
-            
-            let weightOptions = '';
-            
-            if (fontFamiliesMap[selectedFamily]) {
-                fontFamiliesMap[selectedFamily].forEach(w => {
-                    weightOptions += `<option value="${w.val}">${w.name} (${w.val})</option>`;
-                });
-            } else {
-                weightOptions = `
-                    <option value="400">عادي (Regular)</option>
-                    <option value="700">عريض (Bold)</option>
-                `;
-            }
-            
-            weightSelector.innerHTML = weightOptions;
-            
-            let weightFound = false;
-            for(let i=0; i<weightSelector.options.length; i++) {
-                if(weightSelector.options[i].value === currentWeight) {
-                    weightSelector.selectedIndex = i;
-                    weightFound = true;
-                    break;
-                }
-            }
-            
-            if (!weightFound && weightSelector.options.length > 0) {
-                let regularIdx = 0;
-                for(let i=0; i<weightSelector.options.length; i++) {
-                    if(weightSelector.options[i].value === "400") regularIdx = i;
-                }
-                weightSelector.selectedIndex = regularIdx;
-            }
-
-            updateTextareasFont();
-        }
-
-        fontSelector.addEventListener('change', () => {
-            updateWeightSelector();
-            if(document.getElementById('output-text').innerHTML.trim() !== '') {
-                processTextWeb(); 
-            }
-        });
-
-        weightSelector.addEventListener('change', () => {
-            updateTextareasFont();
-            if(document.getElementById('output-text').innerHTML.trim() !== '') {
-                processTextWeb();
-            }
-        });
-
-        function updateTextareasFont() {
-            const font = fontSelector.value;
-            const weight = weightSelector.value;
-            
-            document.getElementById('input-text').style.fontFamily = font;
-            document.getElementById('output-text').style.fontFamily = font;
-            document.getElementById('input-text').style.fontWeight = weight;
-            document.getElementById('output-text').style.fontWeight = weight;
-            
-            document.querySelectorAll('.history-text').forEach(el => {
-                el.style.fontFamily = font;
-                el.style.fontWeight = weight;
-            });
-        }
-
-        document.getElementById('opentype-ligatures').addEventListener('change', function() {
-            const outBox = document.getElementById('output-text');
-            if (this.checked) {
-                outBox.style.fontVariantLigatures = 'contextual common-ligatures';
-                outBox.style.fontFeatureSettings = '"liga" 1, "clig" 1, "calt" 1';
-            } else {
-                outBox.style.fontVariantLigatures = 'none';
-                outBox.style.fontFeatureSettings = '"liga" 0, "clig" 0, "calt" 0';
-            }
-            if(outBox.innerHTML.trim() !== '') {
-                processTextWeb(); 
-            }
-        });
-
-        // ==========================================
-        // 2. المحرك الأساسي للكشيدة
-        // ==========================================
-        const measureDiv = document.createElement('div');
-        measureDiv.style.position = 'absolute';
-        measureDiv.style.visibility = 'hidden';
-        measureDiv.style.whiteSpace = 'nowrap';
-        document.body.appendChild(measureDiv);
-
-        function measureText(text, element) {
-            measureDiv.style.fontFamily = window.getComputedStyle(element).fontFamily;
-            measureDiv.style.fontSize = window.getComputedStyle(element).fontSize;
-            measureDiv.style.fontWeight = window.getComputedStyle(element).fontWeight;
-            measureDiv.style.fontVariantLigatures = window.getComputedStyle(element).fontVariantLigatures;
-            measureDiv.style.fontFeatureSettings = window.getComputedStyle(element).fontFeatureSettings;
-            
-            measureDiv.textContent = text || '.'; 
-            return measureDiv.clientWidth;
-        }
-
         const ARABIC = {
             kashidaChar: "\u0640",
             disconnected: ['\u0627', '\u0623', '\u0625', '\u0622', '\u0671', '\u062F', '\u0630', '\u0631', '\u0632', '\u0648', '\u0649', '\u0698'],
@@ -570,32 +249,38 @@
             priority2Before: ['\u062F', '\u0647', '\u0629', '\u062A'], 
             priority3Before: ['\u0627', '\u0623', '\u0625', '\u0622', '\u0643'], 
             priority4Before: ['\u0641', '\u0642', '\u0639', '\u0648'], 
-            toothedLetters: ['\u0628', '\u062A', '\u062B', '\u0646', '\u064A'], 
-            roundedLetters: ['\u0645', '\u0641', '\u0642'], 
-            noKashidaAfter: ['\u0643'], 
-            noKashidaBefore: ['\u0644', '\u064A'], 
             forbiddenWords: ['على', 'إلى', 'الى', 'إلا', 'الا', 'هذا', 'هذه', 'ذلك', 'تلك', 'عن', 'من', 'ما', 'لا', 'أن', 'إن', 'أو', 'في', 'كل', 'كان', 'له', 'لك', 'لي', 'بك', 'بي', 'هو', 'هي', 'أنا', 'نحن', 'هم'],
             kurdishLetters: ['\u067E', '\u0686', '\u06A4', '\u06AF', '\u0695', '\u06B5', '\u06C6', '\u06CE', '\u06D5'],
             kurdishExtendable: ['\u067E', '\u0686', '\u06A4', '\u06AF', '\u06B5', '\u06CE'],
-            kurdishNoExtend: ['\u06C6', '\u06D5', '\u0695']
+            kurdishNoExtend: ['\u06C6', '\u06D5', '\u0695'],
+            wideChars: ['س','ش','ص','ض','ط','ظ','ف','ق','ك','م','ه','ي'],
+            narrowChars: ['ا','أ','إ','آ','ء','د','ذ','ر','ز','و','ل']
         };
 
         function trim(str) { return str.replace(/^\s+|\s+$/g, ''); }
-        
+        function removeDiacritics(text) { return text.replace(/[\u064B-\u0652\u0653-\u065F\u0670]/g, ''); }
         function isArabicChar(ch) {
             if(!ch) return false;
             const code = ch.charCodeAt(0);
             return (code >= 0x0600 && code <= 0x06FF) || (code >= 0x0750 && code <= 0x077F) || (code >= 0x08A0 && code <= 0x08FF) || (code >= 0xFB50 && code <= 0xFDFF) || (code >= 0xFE70 && code <= 0xFEFF);
         }
-
         function isPunctuation(ch) {
             if(!ch) return false;
-            const punctuation = '.,;:!?\u060C\u061B\u061F-_()[]{}"\'\u00AB\u00BB\u2018\u2019\u201C\u201D';
-            return punctuation.indexOf(ch) !== -1;
+            return '.,;:!?\u060C\u061B\u061F-_()[]{}"\'\u00AB\u00BB\u2018\u2019\u201C\u201D'.indexOf(ch) !== -1;
         }
 
-        function removeDiacritics(text) {
-            return text.replace(/[\u064B-\u0652\u0653-\u065F\u0670]/g, '');
+        // --- محرك الكثافة النسبية الجديد (Pixel-less Engine) ---
+        function calculateRelativeWeight(text) {
+            let weight = 0;
+            let clean = removeDiacritics(text);
+            for(let i = 0; i < clean.length; i++) {
+                let char = clean[i];
+                if (ARABIC.wideChars.includes(char)) weight += 1.4;
+                else if (ARABIC.narrowChars.includes(char)) weight += 0.6;
+                else if (char === ' ' || char === '\u00A0' || char === ARABIC.kashidaChar) weight += 1.0;
+                else weight += 1.0; // الحروف العادية
+            }
+            return weight;
         }
 
         function canPlaceKashida(word, position, kurdishMode) {
@@ -617,14 +302,11 @@
 
             if (ARABIC.disconnected.includes(current)) return false;
             if (position === 0) return false;
-            if (ARABIC.noKashidaAfter.includes(current)) return false;
-            
             const LAM = '\u0644';
             if (current === LAM || next === LAM) return false;
 
             const isAlef = ['\u0627', '\u0623', '\u0625', '\u0622'].includes(current);
             const nextIsAlef = ['\u0627', '\u0623', '\u0625', '\u0622'].includes(next);
-
             if ((isAlef && next === LAM) || (current === LAM && nextIsAlef)) return false;
             if (next === '\u064A' || next === '\u0629') return false;
 
@@ -646,7 +328,6 @@
             if (ARABIC.priority2Before.includes(next)) priority += 8;
             if (ARABIC.priority3Before.includes(next)) priority += 6;
             if (ARABIC.priority4Before.includes(next)) priority += 4;
-            
             return priority;
         }
 
@@ -656,12 +337,8 @@
                 let priority = getPositionPriority(word, i, kurdishMode);
                 if (priority > 0) candidates.push({ position: i, priority: priority });
             }
-            
-            if (randomize) {
-                candidates.sort(() => Math.random() - 0.5);
-            } else {
-                candidates.sort((a, b) => b.priority - a.priority);
-            }
+            if (randomize) candidates.sort(() => Math.random() - 0.5);
+            else candidates.sort((a, b) => b.priority - a.priority);
             
             let positions = candidates.slice(0, maxPositions).map(c => c.position);
             positions.sort((a, b) => a - b); 
@@ -674,7 +351,6 @@
             let remainder = count % positions.length;
             let result = [];
             let lastIndex = 0;
-
             for (let i = 0; i < positions.length; i++) {
                 let pos = positions[i];
                 result.push(word.substring(lastIndex, pos + 1));
@@ -687,33 +363,19 @@
         }
 
         let generationHistory = [];
-
         function updateHistoryUI() {
             const container = document.getElementById('history-container');
             const list = document.getElementById('history-list');
-            
-            if (generationHistory.length === 0) {
-                container.style.display = 'none';
-                return;
-            }
+            if (generationHistory.length === 0) { container.style.display = 'none'; return; }
             
             container.style.display = 'block';
             list.innerHTML = '';
-            
-            const currentFont = fontSelector.value;
-            const currentWeight = weightSelector.value;
-
             for(let i = generationHistory.length - 1; i >= 0; i--) {
-                let itemHtml = generationHistory[i];
                 let itemDiv = document.createElement('div');
                 itemDiv.className = 'history-item';
-                
                 let textDiv = document.createElement('div');
                 textDiv.className = 'history-text';
-                textDiv.style.fontFamily = currentFont; 
-                textDiv.style.fontWeight = currentWeight;
-                textDiv.innerHTML = itemHtml;
-                
+                textDiv.innerHTML = generationHistory[i];
                 let copyBtn = document.createElement('button');
                 copyBtn.textContent = '📋 نسخ';
                 copyBtn.className = 'btn-secondary copy-history-btn';
@@ -722,13 +384,9 @@
                         let originalText = copyBtn.textContent;
                         copyBtn.textContent = '✔️ تم النسخ';
                         copyBtn.classList.add('btn-success');
-                        setTimeout(() => {
-                            copyBtn.textContent = originalText;
-                            copyBtn.classList.remove('btn-success');
-                        }, 1000);
+                        setTimeout(() => { copyBtn.textContent = originalText; copyBtn.classList.remove('btn-success'); }, 1000);
                     });
                 };
-                
                 itemDiv.appendChild(textDiv);
                 itemDiv.appendChild(copyBtn);
                 list.appendChild(itemDiv);
@@ -739,176 +397,103 @@
             const inputText = document.getElementById('input-text').value;
             const outputBox = document.getElementById('output-text');
             
-            if(!inputText.trim()) {
-                outputBox.innerHTML = '';
-                return;
-            }
+            if(!inputText.trim()) { outputBox.innerHTML = ''; return; }
 
-            const style = window.getComputedStyle(outputBox);
-            const paddingX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
-            const maxContainerWidth = outputBox.clientWidth - paddingX;
-            
             const alignMode = document.getElementById('alignment-mode').value;
             const maxPerWord = parseInt(document.getElementById('max-kashida').value);
             const kurdishMode = document.getElementById('kurdish-mode').checked;
             const forceLastLine = document.getElementById('force-last-line').checked;
             const isRandomMode = document.getElementById('random-mode').checked;
-            const keepOriginalLines = document.getElementById('keep-lines-mode').checked; // الخيار الجديد
 
             const cleanInput = inputText.replace(new RegExp(ARABIC.kashidaChar, 'g'), '');
-            const paragraphs = cleanInput.split(/\n/); // تقسيم بناءً على الإنتر فقط
+            const paragraphs = cleanInput.split(/\n/);
             
             let finalHtml = '';
+            let allLines = [];
+            
+            // النظام الآن يحافظ دائماً على السطور كما أدخلها المستخدم (مفيد لفوتوبيا والموبايل)
+            paragraphs.forEach(para => {
+                if(trim(para).length === 0) {
+                    allLines.push({ words: [], isLastInPara: true });
+                } else {
+                    allLines.push({ words: para.split(' ').filter(w => trim(w).length > 0), isLastInPara: true });
+                }
+            });
 
             if (alignMode === 'manual') {
-                paragraphs.forEach(para => {
-                    if(trim(para).length === 0) {
-                        finalHtml += '<br>';
-                        return;
-                    }
-                    const words = para.split(' ').filter(w => trim(w).length > 0);
-                    let lineWords = [...words];
-                    
+                allLines.forEach(line => {
+                    if(line.words.length === 0) { finalHtml += '<br>'; return; }
+                    let lineWords = [...line.words];
                     lineWords.forEach((word, wIdx) => {
                         let positions = findKashidaPositions(removeDiacritics(word), maxPerWord, kurdishMode, isRandomMode);
-                        if(positions.length > 0) {
-                            lineWords[wIdx] = insertKashida(word, positions, maxPerWord);
-                        }
+                        if(positions.length > 0) lineWords[wIdx] = insertKashida(word, positions, maxPerWord);
                     });
-                    
                     finalHtml += `<div>${lineWords.join(' ')}</div>`;
                 });
-            } 
-            else {
-                let allLines = [];
-                
-                // هنا التعديل السحري للموبايل
-                if (keepOriginalLines) {
-                    paragraphs.forEach(para => {
-                        if(trim(para).length === 0) {
-                            allLines.push({ words: [], isLastInPara: true });
-                        } else {
-                            allLines.push({ words: para.split(' ').filter(w => trim(w).length > 0), isLastInPara: true });
-                        }
-                    });
-                } else {
-                    // الطريقة القديمة اللي بتكسر السطور بناءً على حجم الشاشة
-                    paragraphs.forEach(para => {
-                        if(trim(para).length === 0) {
-                            allLines.push({ words: [], isLastInPara: true });
-                            return;
-                        }
-
-                        const words = para.split(' ').filter(w => trim(w).length > 0);
-                        let currentLine = [];
-
-                        for(let i=0; i<words.length; i++) {
-                            let testLine = currentLine.concat(words[i]).join(' ');
-                            let testWidth = measureText(testLine, outputBox);
-                            
-                            if(testWidth > maxContainerWidth && currentLine.length > 0) {
-                                allLines.push({ words: [...currentLine], isLastInPara: false });
-                                currentLine = [words[i]];
-                            } else {
-                                currentLine.push(words[i]);
-                            }
-                        }
-                        if(currentLine.length > 0) {
-                            allLines.push({ words: currentLine, isLastInPara: true });
-                        }
-                    });
-                }
-
-                let actualTargetWidth = 0;
+            } else {
+                // وضع الكثافة النسبية الذكي (Smart Engine)
+                let targetWeight = 0;
                 let longestLineIndex = -1;
                 
-                if (alignMode === 'box' && !keepOriginalLines) {
-                    actualTargetWidth = maxContainerWidth;
-                } else {
-                    // قياس أطول سطر موجود بالفعل في الإدخال ومطابقة الباقي به
-                    allLines.forEach((line, index) => {
-                        let w = measureText(line.words.join(' '), outputBox);
-                        if(w > actualTargetWidth) {
-                            actualTargetWidth = w;
-                            longestLineIndex = index;
-                        }
-                    });
-                }
+                allLines.forEach((line, index) => {
+                    let w = calculateRelativeWeight(line.words.join(' '));
+                    if(w > targetWeight) {
+                        targetWeight = w;
+                        longestLineIndex = index;
+                    }
+                });
 
                 allLines.forEach((line, index) => {
-                    if(line.words.length === 0) {
-                        finalHtml += '<br>';
-                        return;
-                    }
-
+                    if(line.words.length === 0) { finalHtml += '<br>'; return; }
                     let lineStr = line.words.join(' ');
                     
-                    if (alignMode === 'longest' && index === longestLineIndex) {
-                        finalHtml += `<div>${lineStr}</div>`;
-                        return;
+                    if (index === longestLineIndex) {
+                        finalHtml += `<div>${lineStr}</div>`; return;
+                    }
+                    if (line.isLastInPara && !forceLastLine) {
+                        finalHtml += `<div>${lineStr}</div>`; return; 
                     }
 
-                    if(line.isLastInPara && !forceLastLine) {
-                        finalHtml += `<div>${lineStr}</div>`;
-                        return; 
-                    }
+                    let currentWeight = calculateRelativeWeight(lineStr);
+                    let gap = targetWeight - currentWeight;
 
-                    let currentWidth = measureText(lineStr, outputBox);
-                    let gap = actualTargetWidth - currentWidth;
-
-                    if(gap > 5) {
+                    if(gap > 0.8) { // إذا كان السطر يحتاج لكشيدة بناء على وزنه
                         let lineWords = [...line.words];
                         let wordData = [];
                         lineWords.forEach((word, wIdx) => {
                             let positions = findKashidaPositions(removeDiacritics(word), maxPerWord, kurdishMode, isRandomMode);
                             if(positions.length > 0) {
-                                wordData.push({
-                                    index: wIdx,
-                                    original: word,
-                                    positions: positions,
-                                    currentKashida: 0,
-                                    maxKashida: maxPerWord 
-                                });
+                                wordData.push({ index: wIdx, original: word, positions: positions, currentKashida: 0, maxKashida: maxPerWord });
                             }
                         });
 
                         let attempts = 0;
                         let maxAttempts = gap * 2; 
 
-                        while(gap > 0 && attempts < maxAttempts) {
+                        while(gap > 0.8 && attempts < maxAttempts) {
                             attempts++;
-                            
                             let availableWords = wordData.filter(w => w.currentKashida < w.maxKashida);
-                            
                             if (availableWords.length === 0) {
                                 wordData.forEach(w => w.maxKashida += 1);
                                 availableWords = wordData;
                             }
-                            
                             if (availableWords.length === 0) break;
 
                             availableWords.sort((a,b) => a.currentKashida - b.currentKashida);
-                            let targetWord;
-                            
-                            if (isRandomMode) {
-                                let minKashidaCount = availableWords[0].currentKashida;
-                                let candidates = availableWords.filter(w => w.currentKashida === minKashidaCount);
-                                let randomIndex = Math.floor(Math.random() * candidates.length);
-                                targetWord = candidates[randomIndex];
-                            } else {
-                                targetWord = availableWords[0];
-                            }
+                            let targetWord = isRandomMode ? 
+                                availableWords.filter(w => w.currentKashida === availableWords[0].currentKashida)[Math.floor(Math.random() * availableWords.filter(w => w.currentKashida === availableWords[0].currentKashida).length)] 
+                                : availableWords[0];
 
                             targetWord.currentKashida++;
                             lineWords[targetWord.index] = insertKashida(targetWord.original, targetWord.positions, targetWord.currentKashida);
                             
-                            let newWidth = measureText(lineWords.join(' '), outputBox);
-                            if(newWidth > actualTargetWidth) {
+                            let newWeight = calculateRelativeWeight(lineWords.join(' '));
+                            if(newWeight > targetWeight + 0.5) { // إذا تجاوز الهدف، تراجع
                                 targetWord.currentKashida--;
                                 lineWords[targetWord.index] = insertKashida(targetWord.original, targetWord.positions, targetWord.currentKashida);
                                 break;
                             }
-                            gap = actualTargetWidth - newWidth;
+                            gap = targetWeight - newWeight;
                         }
                         finalHtml += `<div>${lineWords.join(' ')}</div>`;
                     } else {
@@ -918,13 +503,10 @@
             }
 
             outputBox.innerHTML = finalHtml;
-
             if (finalHtml.trim() !== '') {
                 if (generationHistory.length === 0 || generationHistory[generationHistory.length - 1] !== finalHtml) {
                     generationHistory.push(finalHtml);
-                    if(generationHistory.length > 3) {
-                        generationHistory.shift(); 
-                    }
+                    if(generationHistory.length > 3) generationHistory.shift(); 
                     updateHistoryUI();
                 }
             }
@@ -932,32 +514,19 @@
 
         document.getElementById('apply-btn').addEventListener('click', () => {
             processTextWeb();
-            const applyBtn = document.getElementById('apply-btn');
-            applyBtn.textContent = 'تم المعاينة ✔️';
-            applyBtn.classList.add('btn-success');
-            setTimeout(() => {
-                applyBtn.textContent = 'معاينة في الأداة';
-                applyBtn.classList.remove('btn-success');
-            }, 1000);
+            const btn = document.getElementById('apply-btn');
+            btn.textContent = 'تم المعاينة ✔️';
+            btn.classList.add('btn-success');
+            setTimeout(() => { btn.textContent = 'معاينة في الأداة'; btn.classList.remove('btn-success'); }, 1000);
         });
 
         document.getElementById('copy-main-btn').addEventListener('click', function() {
             const outputText = document.getElementById('output-text').innerText;
             if(!outputText) return;
-            
             navigator.clipboard.writeText(outputText).then(() => {
                 let btn = document.getElementById('copy-main-btn');
-                btn.textContent = '✔️ تم';
-                btn.style.opacity = '1';
-                btn.style.backgroundColor = 'var(--success-color)';
-                btn.style.borderColor = 'var(--success-color)';
-                
-                setTimeout(() => {
-                    btn.textContent = '📋 نسخ';
-                    btn.style.opacity = '';
-                    btn.style.backgroundColor = '';
-                    btn.style.borderColor = '';
-                }, 1500);
+                btn.textContent = '✔️ تم'; btn.classList.add('btn-success');
+                setTimeout(() => { btn.textContent = '📋 نسخ'; btn.classList.remove('btn-success'); }, 1500);
             });
         });
 
@@ -966,33 +535,19 @@
         });
 
         document.getElementById('alignment-mode').addEventListener('change', processTextWeb);
-        document.getElementById('keep-lines-mode').addEventListener('change', processTextWeb);
-        
-        let lastWindowWidth = window.innerWidth;
-        window.addEventListener('resize', () => {
-            if(window.innerWidth !== lastWindowWidth) {
-                lastWindowWidth = window.innerWidth;
-                if(document.getElementById('output-text').innerHTML.trim() !== '') {
-                    clearTimeout(window.resizeTimer);
-                    window.resizeTimer = setTimeout(processTextWeb, 200);
-                }
-            }
-        });
-
         document.getElementById('remove-btn').addEventListener('click', function() {
             let txt = document.getElementById('input-text').value;
             txt = txt.replace(new RegExp(ARABIC.kashidaChar, 'g'), '');
             txt = removeDiacritics(txt);
             document.getElementById('input-text').value = txt;
-            document.getElementById('output-text').innerHTML = txt.replace(/\n/g, '<br>');
+            document.getElementById('output-text').innerHTML = txt.replace(/\n/g, '<div><br></div>');
         });
 
         // ==========================================
-        // 3. الربط المباشر مع Photopea (Live Messaging)
+        // الربط المباشر مع Photopea 
         // ==========================================
         let autoPushToPhotopea = false;
 
-        // دالة مخصصة لإرسال النتيجة إلى فوتوبيا
         function pushTextToPhotopea() {
             const outputText = document.getElementById('output-text').innerText;
             if (!outputText.trim()) return;
@@ -1016,47 +571,35 @@
             window.parent.postMessage(script, "*");
             
             const btn = document.getElementById('auto-photopea-btn');
-            const originalText = "✨ تطبيق الكشيدة بضغطة";
             btn.innerHTML = "✔️ تم التحديث بنجاح";
-            setTimeout(() => btn.innerHTML = originalText, 2000);
+            setTimeout(() => btn.innerHTML = "✨ تطبيق الكشيدة بضغطة", 2000);
         }
 
-        // استقبال الرسائل ومعالجتها
         window.addEventListener("message", function(e) {
             if (e.data === "done") return;
-            
             if (e.data === "ERROR_NO_TEXT_LAYER") {
                 alert("يرجى تحديد لاير نص (Text Layer) داخل البرنامج أولاً!");
                 autoPushToPhotopea = false;
-                const btn = document.getElementById('auto-photopea-btn');
-                btn.innerHTML = "✨ تطبيق الكشيدة بضغطة";
+                document.getElementById('auto-photopea-btn').innerHTML = "✨ تطبيق الكشيدة بضغطة";
                 return;
             }
 
             if (typeof e.data === "string") {
                 document.getElementById('input-text').value = e.data;
-                processTextWeb(); // معالجة النص
-                
-                // إذا كان الطلب من زر التطبيق المباشر، نقوم بالإرسال فوراً
+                processTextWeb();
                 if (autoPushToPhotopea) {
-                    setTimeout(() => {
-                        pushTextToPhotopea();
-                        autoPushToPhotopea = false;
-                    }, 100); 
+                    setTimeout(() => { pushTextToPhotopea(); autoPushToPhotopea = false; }, 100); 
                 }
             }
         });
 
-        // 1. زر التطبيق بضغطة واحدة (سحب -> معالجة -> إرسال)
         document.getElementById('auto-photopea-btn').addEventListener('click', function() {
-            autoPushToPhotopea = true; // تفعيل إشارة الإرسال التلقائي
+            autoPushToPhotopea = true; 
             const script = "try { var doc = app.activeDocument; var layer = doc.activeLayer; if (layer && layer.textItem) { app.echoToOE(layer.textItem.contents); } else { app.echoToOE('ERROR_NO_TEXT_LAYER'); } } catch(e) { app.echoToOE('ERROR_NO_TEXT_LAYER'); }";
             window.parent.postMessage(script, "*");
-            
             this.innerHTML = "⏳ جاري التطبيق...";
         });
 
-        // 2. زر إزالة الكشيدة من فوتوبيا مباشرة
         document.getElementById('remove-photopea-btn').addEventListener('click', function() {
             const script = `
                 try {
@@ -1067,12 +610,9 @@
                     } else {
                         app.echoToOE('ERROR_NO_TEXT_LAYER');
                     }
-                } catch(e) {
-                    app.echoToOE('ERROR_NO_TEXT_LAYER');
-                }
+                } catch(e) { app.echoToOE('ERROR_NO_TEXT_LAYER'); }
             `;
             window.parent.postMessage(script, "*");
-            
             const originalText = this.innerHTML;
             this.innerHTML = "✔️ تمت الإزالة";
             setTimeout(() => this.innerHTML = originalText, 1500);
